@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AeroFiles</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%A4%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --sky-1:#eaf6ff;
+    --sky-2:#bfe0f7;
+    --sky-3:#8fc7ec;
+    --blue-4:#2f8fdb;
+    --blue-5:#1c6fc0;
+    --blue-dark:#0c3866;
+    --text-dark:#123a56;
+    --text-muted:#4a728c;
+    --glass:rgba(255,255,255,0.55);
+    --glass-light:rgba(255,255,255,0.75);
+    --glass-border:rgba(255,255,255,0.75);
+    --accent-photo:#7c6fd6;
+    --accent-video:#e0546a;
+    --accent-audio:#2fae7a;
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    min-height:100%;
+    font-family:'Segoe UI','Segoe UI Variable',Tahoma,Geneva,Verdana,sans-serif;
+    color:var(--text-dark);
+  }
+
+  body{
+    background:
+      radial-gradient(ellipse at top, #ffffff 0%, transparent 55%),
+      linear-gradient(180deg,#bfe3f7 0%, #dff1fb 35%, #f5fbff 70%, #ffffff 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+    overflow-x:hidden;
+    animation:pageIn .6s ease both;
+  }
+
+  @keyframes pageIn{from{opacity:0;}to{opacity:1;}}
+
+  /* --- decorative floating "aero" light orbs --- */
+  .bg-decor{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .orb{position:absolute;border-radius:50%;filter:blur(2px);animation:floatOrb 16s ease-in-out infinite alternate;}
+  .orb1{width:320px;height:320px;top:-100px;left:-100px;
+    background:radial-gradient(circle at 32% 32%, rgba(255,255,255,0.85), rgba(150,215,255,0.25) 60%, transparent 72%);}
+  .orb2{width:420px;height:420px;top:12%;right:-160px;animation-delay:-5s;
+    background:radial-gradient(circle at 38% 38%, rgba(190,255,220,0.55), rgba(120,220,180,0.15) 60%, transparent 72%);}
+  .orb3{width:260px;height:260px;bottom:-70px;left:12%;animation-delay:-9s;
+    background:radial-gradient(circle at 35% 35%, rgba(255,255,255,0.75), rgba(140,205,255,0.2) 60%, transparent 72%);}
+  .orb4{width:190px;height:190px;bottom:8%;right:8%;animation-delay:-2.5s;
+    background:radial-gradient(circle at 40% 40%, rgba(255,240,180,0.5), rgba(255,210,140,0.12) 60%, transparent 72%);}
+  @keyframes floatOrb{0%{transform:translate(0,0);}100%{transform:translate(22px,-28px);}}
+
+  /* --- top bar --- */
+  .topbar{
+    position:relative;z-index:1;
+    display:flex;align-items:center;gap:10px;
+    padding:16px 28px;
+  }
+  .topbar .logo-orb{
+    width:34px;height:34px;border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, #ffffff, #8fd3ff 40%, #1c6fc0 78%, #0c3866 100%);
+    box-shadow:0 2px 6px rgba(10,50,90,0.4), inset 0 -3px 5px rgba(0,60,110,0.4), inset 0 3px 4px rgba(255,255,255,0.8);
+  }
+  .topbar .logo-text{
+    font-weight:700;font-size:1.15rem;color:var(--blue-dark);
+    text-shadow:0 1px 0 rgba(255,255,255,0.6);
+    letter-spacing:.2px;
+  }
+  .topbar .logo-sub{font-size:.78rem;color:var(--text-muted);margin-left:4px;}
+
+  /* --- main "window" --- */
+  .app-window{
+    position:relative;z-index:1;
+    max-width:1120px;
+    margin:10px auto 40px;
+    border-radius:20px;
+    overflow:hidden;
+    background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.5));
+    backdrop-filter:blur(18px) saturate(160%);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
+    border:1px solid var(--glass-border);
+    box-shadow:0 30px 70px rgba(10,55,95,0.28), inset 0 1px 0 rgba(255,255,255,0.9);
+    transition:max-width .35s ease, margin .35s ease, border-radius .35s ease;
+  }
+  .app-window.maximized{
+    max-width:100%;
+    margin:0;
+    border-radius:0;
+    min-height:100vh;
+  }
+  .app-window.shake{animation:shake .4s;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-6px);}
+    40%{transform:translateX(6px);}
+    60%{transform:translateX(-4px);}
+    80%{transform:translateX(4px);}
+  }
+
+  /* --- title bar --- */
+  .titlebar{
+    position:relative;
+    height:52px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 10px 0 18px;
+    background:linear-gradient(180deg,#f2fbff 0%, #cfe9f9 44%, #9dceec 46%, #d9f0fb 100%);
+    border-bottom:1px solid rgba(255,255,255,0.7);
+  }
+  .titlebar::after{
+    content:"";position:absolute;left:0;right:0;top:0;height:50%;
+    background:linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0));
+    pointer-events:none;
+  }
+  .title-left{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--blue-dark);position:relative;z-index:1;}
+  .title-left .icon{font-size:1.1rem;}
+
+  .window-controls{display:flex;gap:8px;position:relative;z-index:1;}
+  .win-btn{
+    width:24px;height:24px;border-radius:50%;
+    border:1px solid rgba(20,60,100,0.25);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.7rem;line-height:1;color:rgba(20,50,80,0.55);
+    box-shadow:inset 0 2px 3px rgba(255,255,255,0.9), inset 0 -3px 4px rgba(0,0,0,0.08);
+    transition:transform .15s ease, filter .15s ease;
+  }
+  .win-btn:hover{filter:brightness(1.08);transform:translateY(-1px);}
+  .win-btn:active{transform:translateY(0) scale(.92);}
+  .win-btn.min{background:linear-gradient(180deg,#fff3b0,#f0c94a);}
+  .win-btn.max{background:linear-gradient(180deg,#c9f6cf,#63cf75);}
+  .win-btn.close{background:linear-gradient(180deg,#ffc2c2,#e05454);}
+
+  /* --- tabs --- */
+  .tabs{
+    display:flex;flex-wrap:wrap;gap:8px;
+    padding:16px 20px 4px;
+  }
+  .tab{
+    display:flex;align-items:center;gap:6px;
+    padding:8px 16px;border-radius:20px;
+    background:rgba(255,255,255,0.4);
+    border:1px solid rgba(255,255,255,0.7);
+    color:var(--text-muted);font-size:.85rem;font-weight:600;
+    cursor:pointer;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.7);
+    transition:all .18s ease;
+  }
+  .tab:hover{background:rgba(255,255,255,0.65);}
+  .tab.active{
+    color:#fff;
+    background:linear-gradient(180deg,#67b6ee,#2f8fdb 55%,#1c6fc0);
+    border-color:rgba(20,80,140,0.4);
+    box-shadow:0 3px 8px rgba(20,80,140,0.35), inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+
+  /* --- dropzone --- */
+  .dropzone{
+    margin:14px 20px 6px;
+    border:2px dashed rgba(60,140,200,0.45);
+    border-radius:16px;
+    padding:34px 20px;
+    text-align:center;
+    background:rgba(255,255,255,0.32);
+    transition:all .2s ease;
+  }
+  .dropzone.dragover{
+    border-color:var(--blue-4);
+    background:rgba(200,235,255,0.55);
+    transform:scale(1.01);
+  }
+  .dropzone-icon{font-size:2.2rem;margin-bottom:6px;}
+  .dropzone p{margin:4px 0;color:var(--text-muted);font-size:.92rem;}
+  .dropzone .hint{font-size:.76rem;color:var(--text-muted);opacity:.85;}
+
+  .btn-upload{
+    position:relative;overflow:hidden;
+    margin-top:10px;
+    padding:12px 30px;
+    border:1px solid rgba(20,80,140,0.4);
+    border-radius:24px;
+    background:linear-gradient(180deg,#8fd6ff 0%, #2f8fdb 50%, #1c6fc0 51%, #3aa0e6 100%);
+    color:#fff;font-weight:700;font-size:.92rem;
+    cursor:pointer;
+    box-shadow:0 6px 14px rgba(20,80,140,0.4), inset 0 1px 0 rgba(255,255,255,0.6);
+    transition:filter .15s ease, transform .1s ease;
+  }
+  .btn-upload::before{
+    content:"";position:absolute;left:4%;right:4%;top:8%;height:38%;
+    background:linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0));
+    border-radius:50% / 100%;
+    pointer-events:none;
+  }
+  .btn-upload:hover{filter:brightness(1.08);}
+  .btn-upload:active{transform:scale(.97);}
+
+  /* --- gallery --- */
+  .gallery-wrap{padding:6px 20px 8px;min-height:120px;}
+  .gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));
+    gap:16px;
+  }
+
+  .card{
+    position:relative;
+    background:rgba(255,255,255,0.55);
+    border:1px solid rgba(255,255,255,0.8);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 6px 16px rgba(10,60,100,0.12), inset 0 1px 0 rgba(255,255,255,0.85);
+    transition:transform .18s ease, box-shadow .18s ease, opacity .2s ease;
+  }
+  .card:hover{transform:translateY(-4px);box-shadow:0 12px 26px rgba(10,60,100,0.2), inset 0 1px 0 rgba(255,255,255,0.85);}
+
+  .badge{
+    position:absolute;top:8px;left:8px;z-index:2;
+    width:26px;height:26px;border-radius:50%;
+    background:rgba(255,255,255,0.85);
+    display:flex;align-items:center;justify-content:center;
+    font-size:.85rem;
+    box-shadow:0 2px 5px rgba(0,0,0,0.15);
+  }
+
+  .thumb{
+    height:140px;width:100%;
+    background:linear-gradient(135deg,#eef7fc,#dbeffc);
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
+    cursor:default;
+  }
+  .thumb img{width:100%;height:100%;object-fit:cover;cursor:zoom-in;}
+  .thumb video{width:100%;height:100%;object-fit:cover;background:#000;}
+  .thumb.thumb-audio{height:auto;flex-direction:column;gap:8px;padding:18px 12px;}
+  .thumb.thumb-audio .big-icon{font-size:2.4rem;}
+  .thumb.thumb-audio audio{width:100%;height:32px;}
+
+  .card-info{padding:10px 12px 12px;}
+  .fname{
+    font-weight:600;font-size:.85rem;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .fmeta{font-size:.72rem;color:var(--text-muted);margin-top:2px;}
+
+  .actions{display:flex;gap:8px;margin-top:9px;}
+  .act-btn{
+    flex:1;
+    display:flex;align-items:center;justify-content:center;gap:4px;
+    padding:6px 4px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.7);
+    font-size:.72rem;font-weight:600;
+    cursor:pointer;
+    background:rgba(255,255,255,0.55);
+    color:var(--text-dark);
+    transition:filter .15s ease, transform .1s ease;
+  }
+  .act-btn:hover{filter:brightness(0.97);}
+  .act-btn:active{transform:scale(.96);}
+  .act-btn.download{background:linear-gradient(180deg,#bfe6ff,#8fc7ec);}
+  .act-btn.delete{background:linear-gradient(180deg,#ffc9c9,#e58a8a);color:#5a1414;}
+
+  /* --- empty state --- */
+  .empty-state{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:6px;padding:36px 10px 44px;
+    color:var(--text-muted);
+    text-align:center;
+  }
+  .empty-state .icon{font-size:2.4rem;opacity:.8;}
+  .empty-state.hidden{display:none;}
+
+  /* --- status bar --- */
+  .statusbar{
+    height:34px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 18px;
+    background:linear-gradient(180deg,#eaf6ff,#cfe9fa);
+    border-top:1px solid rgba(255,255,255,0.7);
+    font-size:.76rem;color:var(--blue-dark);
+  }
+  .statusbar span{display:inline-flex;align-items:center;gap:5px;}
+
+  /* --- lightbox --- */
+  .lightbox{
+    position:fixed;inset:0;z-index:999;
+    background:rgba(8,28,48,0.86);
+    backdrop-filter:blur(6px);
+    display:none;align-items:center;justify-content:center;
+    padding:30px;
+  }
+  .lightbox.active{display:flex;}
+  .lightbox img{max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 25px 70px rgba(0,0,0,0.5);}
+  .lightbox-close{
+    position:absolute;top:22px;right:26px;
+    width:38px;height:38px;border-radius:50%;
+    background:linear-gradient(180deg,#ffc2c2,#e05454);
+    color:#fff;font-size:1.2rem;border:1px solid rgba(255,255,255,0.4);
+    cursor:pointer;
+    box-shadow:0 3px 10px rgba(0,0,0,0.35);
+  }
+
+  /* --- scrollbar --- */
+  ::-webkit-scrollbar{width:12px;height:12px;}
+  ::-webkit-scrollbar-track{background:rgba(255,255,255,0.15);}
+  ::-webkit-scrollbar-thumb{
+    background:linear-gradient(180deg,#a7d8f5,#5aa8de);
+    border-radius:10px;border:2px solid rgba(255,255,255,0.5);
+  }
+
+  @media (max-width:600px){
+    .app-window{margin:0;border-radius:0;max-width:100%;}
+    .topbar{padding:12px 16px;}
+    .titlebar{padding:0 8px 0 12px;}
+    .gallery{grid-template-columns:repeat(auto-fill, minmax(150px,1fr));}
+  }
+</style>
+</head>
+<body>
+
+  <div class="bg-decor">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+    <div class="orb orb4"></div>
+  </div>
+
+  <header class="topbar">
+    <div class="logo-orb"></div>
+    <div class="logo-text">AeroFiles</div>
+    <div class="logo-sub"></div>
+  </header>
+
+  <main class="app-window" id="appWindow">
+    <div class="titlebar">
+      <div class="title-left"><span class="icon"></span><span>Файлы</span></div>
+      <div class="window-controls">
+        <button class="win-btn min" id="btnMin" title="Свернуть">–</button>
+        <button class="win-btn max" id="btnMax" title="Развернуть">▢</button>
+        <button class="win-btn close" id="btnClose" title="Это просто витрина">×</button>
+      </div>
+    </div>
+
+    <div id="collapsible">
+      <nav class="tabs">
+        <button class="tab active" data-filter="all">🗂️ Все файлы</button>
+        <button class="tab" data-filter="photo">🖼️ Фото</button>
+        <button class="tab" data-filter="video">🎬 Видео</button>
+        <button class="tab" data-filter="audio">🎵 Аудио</button>
+      </nav>
+
+      <section class="dropzone" id="dropzone">
+        <div class="dropzone-icon"></div>
+        <p>Перетащите сюда фото, видео или аудио</p>
+        <p class="hint">или нажмите кнопку ниже. Файлы сохраняются локально в этом браузере (IndexedDB).</p>
+        <button class="btn-upload" id="uploadBtn">⬆ Загрузить файлы</button>
+        <input type="file" id="fileInput" multiple hidden accept="image/*,video/*,audio/*">
+      </section>
+
+      <div class="gallery-wrap">
+        <div class="gallery" id="gallery"></div>
+        <div class="empty-state hidden" id="emptyState">
+          <div class="icon"></div>
+          <div>Здесь пока пусто...</div>
+          <div style="font-size:.8rem;">Загрузите первый файл, чтобы увидеть его тут</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="statusbar">
+      <span> <span id="statCount">0</span> файлов</span>
+      <span> <span id="statSize">0 Б</span></span>
+    </footer>
+  </main>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">×</button>
+    <img id="lightboxImg" src="" alt="">
+  </div>
+
+<script>
+(() => {
+  const DB_NAME = 'AeroFilesDB';
+  const DB_VERSION = 1;
+  const STORE = 'files';
+  let db = null;
+  let currentFilter = 'all';
+
+  const $ = (sel) => document.querySelector(sel);
+  const gallery = $('#gallery');
+  const emptyState = $('#emptyState');
+  const fileInput = $('#fileInput');
+  const dropzone = $('#dropzone');
+  const uploadBtn = $('#uploadBtn');
+  const tabs = document.querySelectorAll('.tab');
+  const statCount = $('#statCount');
+  const statSize = $('#statSize');
+  const appWindow = $('#appWindow');
+  const collapsible = $('#collapsible');
+  const btnMin = $('#btnMin');
+  const btnMax = $('#btnMax');
+  const btnClose = $('#btnClose');
+  const lightbox = $('#lightbox');
+  const lightboxImg = $('#lightboxImg');
+  const lightboxClose = $('#lightboxClose');
+
+  const icons = { photo: '🖼️', video: '🎬', audio: '🎵', other: '📄' };
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function openDB(){
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const database = e.target.result;
+        if (!database.objectStoreNames.contains(STORE)) {
+          database.createObjectStore(STORE, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = (e) => resolve(e.target.result);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  function store(mode){
+    return db.transaction(STORE, mode).objectStore(STORE);
+  }
+
+  function addRecord(record){
+    return new Promise((resolve, reject) => {
+      const r = store('readwrite').add(record);
+      r.onsuccess = () => resolve();
+      r.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  function getAllRecords(){
+    return new Promise((resolve, reject) => {
+      const r = store('readonly').getAll();
+      r.onsuccess = () => resolve(r.result.sort((a,b) => b.date - a.date));
+      r.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  function deleteRecord(id){
+    return new Promise((resolve, reject) => {
+      const r = store('readwrite').delete(id);
+      r.onsuccess = () => resolve();
+      r.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  function categoryOf(mime){
+    if (mime.startsWith('image/')) return 'photo';
+    if (mime.startsWith('video/')) return 'video';
+    if (mime.startsWith('audio/')) return 'audio';
+    return 'other';
+  }
+
+  function formatSize(bytes){
+    if (bytes < 1024) return bytes + ' Б';
+    if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' КБ';
+    if (bytes < 1024*1024*1024) return (bytes/1024/1024).toFixed(1) + ' МБ';
+    return (bytes/1024/1024/1024).toFixed(2) + ' ГБ';
+  }
+
+  function formatDate(ts){
+    const d = new Date(ts);
+    return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'});
+  }
+
+  function buildCard(record){
+    const url = URL.createObjectURL(record.blob);
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.id = record.id;
+    card.dataset.category = record.category;
+
+    let mediaHtml = '';
+    if (record.category === 'photo') {
+      mediaHtml = `<div class="thumb"><img src="${url}" alt="${escapeHtml(record.name)}" loading="lazy"></div>`;
+    } else if (record.category === 'video') {
+      mediaHtml = `<div class="thumb"><video src="${url}" controls preload="metadata"></video></div>`;
+    } else if (record.category === 'audio') {
+      mediaHtml = `<div class="thumb thumb-audio"><span class="big-icon">🎵</span><audio controls src="${url}"></audio></div>`;
+    } else {
+      mediaHtml = `<div class="thumb"><span class="big-icon">📄</span></div>`;
+    }
+
+    card.innerHTML = `
+      <span class="badge">${icons[record.category] || icons.other}</span>
+      ${mediaHtml}
+      <div class="card-info">
+        <div class="fname" title="${escapeHtml(record.name)}">${escapeHtml(record.name)}</div>
+        <div class="fmeta">${formatSize(record.size)} · ${formatDate(record.date)}</div>
+        <div class="actions">
+          <button class="act-btn download">⬇ Скачать</button>
+          <button class="act-btn delete">🗑 Удалить</button>
+        </div>
+      </div>
+    `;
+
+    if (record.category === 'photo') {
+      card.querySelector('img').addEventListener('click', () => {
+        lightboxImg.src = url;
+        lightbox.classList.add('active');
+      });
+    }
+
+    card.querySelector('.download').addEventListener('click', () => {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = record.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+
+    card.querySelector('.delete').addEventListener('click', () => {
+      card.style.transform = 'scale(0.85)';
+      card.style.opacity = '0';
+      setTimeout(async () => {
+        await deleteRecord(record.id);
+        URL.revokeObjectURL(url);
+        card.remove();
+        await updateStats();
+        checkEmpty();
+      }, 180);
+    });
+
+    return card;
+  }
+
+  async function renderAll(){
+    gallery.innerHTML = '';
+    const records = await getAllRecords();
+    records.forEach(r => gallery.appendChild(buildCard(r)));
+    applyFilter();
+    updateStatsFromRecords(records);
+  }
+
+  function applyFilter(){
+    const cards = gallery.querySelectorAll('.card');
+    cards.forEach(c => {
+      const show = currentFilter === 'all' || c.dataset.category === currentFilter;
+      c.style.display = show ? '' : 'none';
+    });
+    checkEmpty();
+  }
+
+  function checkEmpty(){
+    const anyVisible = [...gallery.querySelectorAll('.card')].some(c => c.style.display !== 'none');
+    emptyState.classList.toggle('hidden', anyVisible);
+  }
+
+  async function updateStats(){
+    const records = await getAllRecords();
+    updateStatsFromRecords(records);
+  }
+
+  function updateStatsFromRecords(records){
+    statCount.textContent = records.length;
+    const total = records.reduce((s,r) => s + r.size, 0);
+    statSize.textContent = formatSize(total);
+  }
+
+  async function handleFiles(fileList){
+    const incoming = [...fileList];
+    const valid = incoming.filter(f => /^(image|video|audio)\//.test(f.type));
+    if (valid.length === 0 && incoming.length > 0) {
+      alert('Поддерживаются только фото, видео и аудио файлы.');
+      return;
+    }
+    for (const file of valid) {
+      const record = {
+        id: (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + Math.random()),
+        name: file.name,
+        type: file.type,
+        category: categoryOf(file.type),
+        size: file.size,
+        date: Date.now(),
+        blob: file
+      };
+      await addRecord(record);
+      gallery.prepend(buildCard(record));
+      applyFilter();
+      await updateStats();
+    }
+  }
+
+  uploadBtn.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', (e) => {
+    handleFiles(e.target.files);
+    fileInput.value = '';
+  });
+
+  ['dragenter','dragover'].forEach(evt => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault(); e.stopPropagation();
+      dropzone.classList.add('dragover');
+    });
+  });
+  ['dragleave','drop'].forEach(evt => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault(); e.stopPropagation();
+      dropzone.classList.remove('dragover');
+    });
+  });
+  dropzone.addEventListener('drop', (e) => {
+    if (e.dataTransfer && e.dataTransfer.files) handleFiles(e.dataTransfer.files);
+  });
+  window.addEventListener('dragover', (e) => e.preventDefault());
+  window.addEventListener('drop', (e) => e.preventDefault());
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentFilter = tab.dataset.filter;
+      applyFilter();
+    });
+  });
+
+  let minimized = false;
+  btnMin.addEventListener('click', () => {
+    minimized = !minimized;
+    collapsible.style.display = minimized ? 'none' : '';
+  });
+  btnMax.addEventListener('click', () => {
+    appWindow.classList.toggle('maximized');
+  });
+  btnClose.addEventListener('click', () => {
+    appWindow.classList.remove('shake');
+    void appWindow.offsetWidth;
+    appWindow.classList.add('shake');
+  });
+
+  lightboxClose.addEventListener('click', () => lightbox.classList.remove('active'));
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.classList.remove('active'); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') lightbox.classList.remove('active'); });
+
+  (async () => {
+    try {
+      db = await openDB();
+      await renderAll();
+    } catch (err) {
+      console.error(err);
+      gallery.innerHTML = '<p style="padding:20px;color:#a33;">Не удалось открыть локальное хранилище браузера. Попробуйте открыть страницу через http://localhost, а не напрямую как файл.</p>';
+    }
+  })();
+})();
+</script>
+</body>
+</html>

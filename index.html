@@ -604,21 +604,21 @@
 
   <main class="home">
     <nav class="tabs" id="tabs">
-      <button class="tab active" data-filter="all" type="button">🗂️ <span data-i18n="tabAll">Все файлы</span></button>
-      <button class="tab" data-filter="photo" type="button">🖼️ <span data-i18n="tabPhoto">Фото</span></button>
-      <button class="tab" data-filter="video" type="button">🎬 <span data-i18n="tabVideo">Видео</span></button>
-      <button class="tab" data-filter="audio" type="button">🎵 <span data-i18n="tabAudio">Аудио</span></button>
-      <button class="tab" data-filter="file" type="button">📁 <span data-i18n="tabFile">Файлы</span></button>
+      <button class="tab active" data-filter="all" type="button"> <span data-i18n="tabAll">Все файлы</span></button>
+      <button class="tab" data-filter="photo" type="button"> <span data-i18n="tabPhoto">Фото</span></button>
+      <button class="tab" data-filter="video" type="button"> <span data-i18n="tabVideo">Видео</span></button>
+      <button class="tab" data-filter="audio" type="button"> <span data-i18n="tabAudio">Аудио</span></button>
+      <button class="tab" data-filter="file" type="button"> <span data-i18n="tabFile">Файлы</span></button>
     </nav>
 
     <section class="dropzone" id="dropzone">
-      <div class="dropzone-icon">☁️</div>
+      <div class="dropzone-icon"></div>
       <p data-i18n="dropTitle">Перетащите сюда файлы</p>
       <p class="hint" data-i18n="dropHint">или выберите способ ниже — всё хранится локально в этом браузере</p>
       <div class="toolbar-row">
-        <button class="aero-btn aero-btn-primary" id="uploadBtn" type="button">⬆ <span data-i18n="btnUpload">Загрузить файлы</span></button>
-        <button class="aero-btn aero-btn-secondary" id="cameraBtn" type="button">📷 <span data-i18n="btnCamera">Сделать фото</span></button>
-        <button class="aero-btn aero-btn-ghost" id="pasteBtn" type="button">📋 <span data-i18n="btnPaste">Вставить</span></button>
+        <button class="aero-btn aero-btn-primary" id="uploadBtn" type="button"> <span data-i18n="btnUpload">Загрузить файлы</span></button>
+        <button class="aero-btn aero-btn-secondary" id="cameraBtn" type="button"> <span data-i18n="btnCamera">Сделать фото</span></button>
+        <button class="aero-btn aero-btn-ghost" id="pasteBtn" type="button"> <span data-i18n="btnPaste">Вставить</span></button>
       </div>
       <p class="hint small" data-i18n="pasteHint">Можно вставить файл из буфера обмена — Ctrl+V</p>
       <input type="file" id="fileInput" multiple hidden>
@@ -627,7 +627,7 @@
     <div class="gallery-wrap">
       <div class="gallery" id="gallery"></div>
       <div class="empty-state hidden" id="emptyState">
-        <div class="icon">🗃️</div>
+        <div class="icon"></div>
         <div data-i18n="emptyTitle">Здесь пока пусто…</div>
         <div class="small" data-i18n="emptyHint">Загрузите первый файл, чтобы увидеть его тут</div>
       </div>
@@ -648,7 +648,7 @@
   <div class="overlay" id="viewerOverlay">
     <div class="win7-window viewer-window" id="viewerWindow">
       <div class="win7-titlebar">
-        <div class="win7-title"><span id="viewerIcon">🖼️</span><span id="viewerTitleText" data-i18n="viewerPhoto">Просмотр фото</span></div>
+        <div class="win7-title"><span id="viewerIcon"></span><span id="viewerTitleText" data-i18n="viewerPhoto">Просмотр фото</span></div>
         <div class="win7-controls">
           <button class="win-btn min" id="viewerMin" type="button" title="Свернуть">–</button>
           <button class="win-btn max" id="viewerMax" type="button" title="Развернуть">▢</button>
@@ -666,7 +666,7 @@
       <div class="win7-statusbar">
         <span id="viewerFileName"></span>
         <span class="win7-status-actions">
-          <button class="act-btn share" id="viewerShareBtn" type="button">🔗 <span data-i18n="actShare">Поделиться</span></button>
+          <button class="act-btn share" id="viewerShareBtn" type="button"> <span data-i18n="actShare">Поделиться</span></button>
           <button class="act-btn download" id="viewerDownloadBtn" type="button">⬇ <span data-i18n="actDownload">Скачать</span></button>
         </span>
       </div>
@@ -677,7 +677,7 @@
   <div class="overlay" id="shareOverlay">
     <div class="win7-window share-window" id="shareWindow">
       <div class="win7-titlebar">
-        <div class="win7-title"><span>🔗</span><span data-i18n="shareTitle">Поделиться файлом</span></div>
+        <div class="win7-title"><span></span><span data-i18n="shareTitle">Поделиться файлом</span></div>
         <div class="win7-controls">
           <button class="win-btn min" id="shareMin" type="button" title="Свернуть">–</button>
           <button class="win-btn max" id="shareMax" type="button" title="Развернуть">▢</button>
@@ -702,7 +702,7 @@
   <div class="overlay" id="cameraOverlay">
     <div class="win7-window camera-window" id="cameraWindow">
       <div class="win7-titlebar">
-        <div class="win7-title"><span>📷</span><span data-i18n="cameraTitle">Сделать фото</span></div>
+        <div class="win7-title"><span></span><span data-i18n="cameraTitle">Сделать фото</span></div>
         <div class="win7-controls">
           <button class="win-btn close" id="cameraClose" type="button" title="Закрыть">×</button>
         </div>
@@ -966,7 +966,7 @@
   function showToast(message){
     const toast = document.createElement('div');
     toast.className = 'aero-toast';
-    toast.innerHTML = `<span>🌤️</span><span>${escapeHtml(message)}</span>`;
+    toast.innerHTML = `<span></span><span>${escapeHtml(message)}</span>`;
     toastLayer.appendChild(toast);
     requestAnimationFrame(() => toast.classList.add('show'));
     setTimeout(() => {

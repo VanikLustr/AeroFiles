@@ -2,9 +2,19 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>AeroFiles</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%A4%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%8D%3C/text%3E%3C/svg%3E">
+<script>
+/* Prevent theme flash: resolve effective theme before first paint */
+(function(){
+  try{
+    var pref = localStorage.getItem('aerofiles-theme') || 'system';
+    var dark = pref === 'dark' || (pref === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  }catch(e){}
+})();
+</script>
 <style>
   :root{
     --sky-1:#eaf6ff;
@@ -21,6 +31,23 @@
     --accent-photo:#7c6fd6;
     --accent-video:#e0546a;
     --accent-audio:#2fae7a;
+  }
+
+  :root[data-theme="dark"]{
+    --sky-1:#0a1626;
+    --sky-2:#0f2038;
+    --sky-3:#123049;
+    --blue-4:#3aa0e6;
+    --blue-5:#2f8fdb;
+    --blue-dark:#eaf6ff;
+    --text-dark:#e8f2fb;
+    --text-muted:#93b4cc;
+    --glass:rgba(20,35,58,0.55);
+    --glass-light:rgba(28,48,74,0.65);
+    --glass-border:rgba(255,255,255,0.12);
+    --accent-photo:#a79bff;
+    --accent-video:#ff8fa3;
+    --accent-audio:#5fe0a8;
   }
 
   *{box-sizing:border-box;}
@@ -41,6 +68,12 @@
     min-height:100vh;
     overflow-x:hidden;
     animation:pageIn .6s ease both;
+    transition:background .25s ease, color .25s ease;
+  }
+  :root[data-theme="dark"] body{
+    background:
+      radial-gradient(ellipse at top, rgba(255,255,255,0.06) 0%, transparent 55%),
+      linear-gradient(180deg,#0a1626 0%, #0f2038 35%, #142a44 70%, #0a1626 100%);
   }
 
   @keyframes pageIn{from{opacity:0;}to{opacity:1;}}
@@ -57,72 +90,267 @@
   .orb4{width:190px;height:190px;bottom:8%;right:8%;animation-delay:-2.5s;
     background:radial-gradient(circle at 40% 40%, rgba(255,240,180,0.5), rgba(255,210,140,0.12) 60%, transparent 72%);}
   @keyframes floatOrb{0%{transform:translate(0,0);}100%{transform:translate(22px,-28px);}}
+  :root[data-theme="dark"] .orb1{background:radial-gradient(circle at 32% 32%, rgba(255,255,255,0.22), rgba(80,140,220,0.12) 60%, transparent 72%);}
+  :root[data-theme="dark"] .orb2{background:radial-gradient(circle at 38% 38%, rgba(120,220,180,0.16), rgba(80,160,140,0.06) 60%, transparent 72%);}
+  :root[data-theme="dark"] .orb3{background:radial-gradient(circle at 35% 35%, rgba(255,255,255,0.15), rgba(80,140,220,0.08) 60%, transparent 72%);}
+  :root[data-theme="dark"] .orb4{background:radial-gradient(circle at 40% 40%, rgba(255,220,150,0.14), rgba(255,190,120,0.05) 60%, transparent 72%);}
 
   /* --- top bar --- */
   .topbar{
     position:relative;z-index:1;
-    display:flex;align-items:center;gap:10px;
-    padding:16px 28px;
+    display:flex;align-items:center;flex-wrap:wrap;gap:12px;
+    padding:calc(16px + env(safe-area-inset-top,0px)) 28px 16px;
   }
-  .topbar .logo-orb{
-    width:34px;height:34px;border-radius:50%;
-    background:radial-gradient(circle at 32% 28%, #ffffff, #8fd3ff 40%, #1c6fc0 78%, #0c3866 100%);
-    box-shadow:0 2px 6px rgba(10,50,90,0.4), inset 0 -3px 5px rgba(0,60,110,0.4), inset 0 3px 4px rgba(255,255,255,0.8);
-  }
-  .topbar .logo-text{
-    font-weight:700;font-size:1.15rem;color:var(--blue-dark);
-    text-shadow:0 1px 0 rgba(255,255,255,0.6);
-    letter-spacing:.2px;
-  }
-  .topbar .logo-sub{font-size:.78rem;color:var(--text-muted);margin-left:4px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .earth-logo{flex:0 0 auto;filter:drop-shadow(0 3px 6px rgba(10,50,90,0.5));}
+  .brand-text{display:flex;flex-direction:column;line-height:1.15;}
+  .brand-title{font-weight:700;font-size:1.15rem;color:var(--blue-dark);letter-spacing:.2px;}
+  .brand-tag{font-size:.75rem;color:var(--text-muted);}
 
-  /* --- main "window" --- */
-  .app-window{
-    position:relative;z-index:1;
-    max-width:1120px;
-    margin:10px auto 40px;
-    border-radius:20px;
-    overflow:hidden;
-    background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.5));
-    backdrop-filter:blur(18px) saturate(160%);
-    -webkit-backdrop-filter:blur(18px) saturate(160%);
-    border:1px solid var(--glass-border);
-    box-shadow:0 30px 70px rgba(10,55,95,0.28), inset 0 1px 0 rgba(255,255,255,0.9);
-    transition:max-width .35s ease, margin .35s ease, border-radius .35s ease;
+  .topbar-controls{display:flex;align-items:center;gap:10px;margin-left:auto;}
+  .lang-switch{display:flex;background:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.7);border-radius:16px;padding:3px;gap:2px;}
+  :root[data-theme="dark"] .lang-switch{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);}
+  .lang-btn{border:none;background:transparent;padding:5px 10px;border-radius:12px;font-size:.72rem;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:inherit;}
+  .lang-btn.active{background:linear-gradient(180deg,#67b6ee,#2f8fdb 55%,#1c6fc0);color:#fff;box-shadow:0 2px 6px rgba(20,80,140,.35);}
+  .theme-toggle{
+    width:34px;height:34px;border-radius:50%;flex:0 0 auto;
+    border:1px solid rgba(255,255,255,0.7);background:rgba(255,255,255,0.45);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
   }
-  .app-window.maximized{
-    max-width:100%;
-    margin:0;
-    border-radius:0;
-    min-height:100vh;
+  :root[data-theme="dark"] .theme-toggle{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);}
+
+  /* --- home (no window frame) --- */
+  .home{position:relative;z-index:1;max-width:1120px;margin:6px auto 30px;padding:0 20px;}
+
+  /* --- tabs --- */
+  .tabs{
+    display:flex;gap:8px;
+    padding:6px 2px 14px;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
   }
-  .app-window.shake{animation:shake .4s;}
-  @keyframes shake{
-    0%,100%{transform:translateX(0);}
-    20%{transform:translateX(-6px);}
-    40%{transform:translateX(6px);}
-    60%{transform:translateX(-4px);}
-    80%{transform:translateX(4px);}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{
+    display:flex;align-items:center;gap:6px;flex:0 0 auto;
+    padding:8px 16px;border-radius:20px;
+    background:rgba(255,255,255,0.4);
+    border:1px solid rgba(255,255,255,0.7);
+    color:var(--text-muted);font-size:.85rem;font-weight:600;
+    cursor:pointer;font-family:inherit;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.7);
+    transition:all .18s ease;
+    white-space:nowrap;
+  }
+  .tab:hover{background:rgba(255,255,255,0.65);}
+  .tab.active{
+    color:#fff;
+    background:linear-gradient(180deg,#67b6ee,#2f8fdb 55%,#1c6fc0);
+    border-color:rgba(20,80,140,0.4);
+    box-shadow:0 3px 8px rgba(20,80,140,0.35), inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+  :root[data-theme="dark"] .tab{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);}
+  :root[data-theme="dark"] .tab.active{box-shadow:0 3px 8px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);}
+
+  /* --- dropzone --- */
+  .dropzone{
+    margin:6px 0 6px;
+    border:2px dashed rgba(60,140,200,0.45);
+    border-radius:16px;
+    padding:30px 20px;
+    text-align:center;
+    background:rgba(255,255,255,0.32);
+    transition:all .2s ease;
+  }
+  :root[data-theme="dark"] .dropzone{background:var(--glass);border-color:rgba(120,170,220,0.4);}
+  .dropzone.dragover{
+    border-color:var(--blue-4);
+    background:rgba(200,235,255,0.55);
+    transform:scale(1.01);
+  }
+  .dropzone-icon{font-size:2.2rem;margin-bottom:6px;}
+  .dropzone p{margin:4px 0;color:var(--text-muted);font-size:.92rem;}
+  .dropzone .hint{font-size:.76rem;color:var(--text-muted);opacity:.85;}
+  .dropzone .hint.small{margin-top:12px;}
+
+  .toolbar-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:14px;}
+
+  /* --- Frutiger Aero buttons --- */
+  .aero-btn{
+    position:relative;overflow:hidden;
+    display:inline-flex;align-items:center;gap:6px;justify-content:center;
+    padding:12px 26px;border-radius:24px;
+    font-weight:700;font-size:.9rem;font-family:inherit;
+    cursor:pointer;border:1px solid rgba(20,80,140,0.4);
+    box-shadow:0 6px 14px rgba(20,80,140,0.4), inset 0 1px 0 rgba(255,255,255,0.6);
+    transition:filter .15s ease, transform .1s ease;
+    color:#fff;
+  }
+  .aero-btn::before{
+    content:"";position:absolute;left:4%;right:4%;top:8%;height:38%;
+    background:linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0));
+    border-radius:50% / 100%;
+    pointer-events:none;
+  }
+  .aero-btn:hover{filter:brightness(1.08);}
+  .aero-btn:active{transform:scale(.97);}
+  .aero-btn-primary{background:linear-gradient(180deg,#8fd6ff 0%, #2f8fdb 50%, #1c6fc0 51%, #3aa0e6 100%);}
+  .aero-btn-secondary{
+    background:linear-gradient(180deg,#bdf7cd 0%, #4fcf7a 50%, #2fae5a 51%, #63d98a 100%);
+    border-color:rgba(15,100,50,0.35);
+    box-shadow:0 6px 14px rgba(15,100,50,0.28), inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+  .aero-btn-ghost{
+    background:rgba(255,255,255,0.5);color:var(--text-dark);
+    border-color:rgba(255,255,255,0.7);box-shadow:inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  .aero-btn-ghost::before{display:none;}
+  :root[data-theme="dark"] .aero-btn-ghost{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);}
+
+  /* --- gallery --- */
+  .gallery-wrap{padding:14px 0 8px;min-height:120px;}
+  .gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));
+    gap:16px;
   }
 
-  /* --- title bar --- */
-  .titlebar{
+  .card{
     position:relative;
-    height:52px;
+    background:var(--glass);
+    border:1px solid var(--glass-border);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 6px 16px rgba(10,60,100,0.12), inset 0 1px 0 rgba(255,255,255,0.5);
+    transition:transform .18s ease, box-shadow .18s ease, opacity .2s ease;
+  }
+  .card:hover{transform:translateY(-4px);box-shadow:0 12px 26px rgba(10,60,100,0.2), inset 0 1px 0 rgba(255,255,255,0.5);}
+
+  .badge{
+    position:absolute;top:8px;left:8px;z-index:2;
+    width:26px;height:26px;border-radius:50%;
+    background:rgba(255,255,255,0.85);
+    display:flex;align-items:center;justify-content:center;
+    font-size:.85rem;
+    box-shadow:0 2px 5px rgba(0,0,0,0.15);
+  }
+
+  .thumb{
+    position:relative;
+    height:140px;width:100%;
+    background:linear-gradient(135deg,#eef7fc,#dbeffc);
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
+    cursor:pointer;
+  }
+  :root[data-theme="dark"] .thumb{background:linear-gradient(135deg,#16283f,#0d1c2e);}
+  .thumb img{width:100%;height:100%;object-fit:cover;}
+  .thumb video{width:100%;height:100%;object-fit:cover;background:#000;}
+  .thumb-play{position:absolute;font-size:1.8rem;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.6);pointer-events:none;}
+  .thumb.thumb-audio,.thumb.thumb-file{flex-direction:column;gap:6px;}
+  .thumb .big-icon{font-size:2.6rem;}
+
+  .card-info{padding:10px 12px 12px;}
+  .fname{
+    font-weight:600;font-size:.85rem;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .fmeta{font-size:.72rem;color:var(--text-muted);margin-top:2px;}
+
+  .actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;}
+  .act-btn{
+    flex:1 1 auto;min-width:0;
+    display:flex;align-items:center;justify-content:center;gap:4px;
+    padding:6px 4px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.7);
+    font-size:.7rem;font-weight:600;font-family:inherit;
+    cursor:pointer;
+    background:rgba(255,255,255,0.55);
+    color:var(--text-dark);
+    transition:filter .15s ease, transform .1s ease;
+  }
+  .act-btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .act-btn:hover{filter:brightness(0.97);}
+  .act-btn:active{transform:scale(.96);}
+  .act-btn.share{background:linear-gradient(180deg,#dcd2ff,#b3a3ee);}
+  .act-btn.download{background:linear-gradient(180deg,#bfe6ff,#8fc7ec);}
+  .act-btn.delete{background:linear-gradient(180deg,#ffc9c9,#e58a8a);color:#5a1414;}
+  :root[data-theme="dark"] .act-btn{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.14);color:var(--text-dark);}
+  :root[data-theme="dark"] .act-btn.share{background:linear-gradient(180deg,#3a3060,#241c40);color:#e9e2ff;}
+  :root[data-theme="dark"] .act-btn.download{background:linear-gradient(180deg,#1c3a55,#123049);color:#dff1ff;}
+  :root[data-theme="dark"] .act-btn.delete{background:linear-gradient(180deg,#5a2323,#3a1414);color:#ffd6d6;}
+
+  /* --- empty state --- */
+  .empty-state{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:6px;padding:36px 10px 44px;
+    color:var(--text-muted);
+    text-align:center;
+  }
+  .empty-state .icon{font-size:2.4rem;opacity:.8;}
+  .empty-state.hidden{display:none;}
+  .empty-state .small{font-size:.8rem;}
+
+  /* --- stats row --- */
+  .stats-row{
     display:flex;align-items:center;justify-content:space-between;
-    padding:0 10px 0 18px;
+    padding:10px 6px 4px;
+    font-size:.78rem;color:var(--text-muted);
+    border-top:1px solid var(--glass-border);
+  }
+
+  /* --- footer --- */
+  .page-footer{
+    position:relative;z-index:1;text-align:center;
+    padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));
+    color:var(--text-muted);font-size:.78rem;
+  }
+  .footer-version{margin-top:4px;font-weight:700;opacity:.75;}
+
+  /* ============ Windows 7 style dialogs (viewer / share / camera / error) ============ */
+  .overlay{
+    position:fixed;inset:0;z-index:999;
+    background:rgba(8,28,48,0.55);
+    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+    display:none;align-items:center;justify-content:center;
+    padding:24px;
+  }
+  .overlay.active{display:flex;}
+  :root[data-theme="dark"] .overlay{background:rgba(0,0,0,0.65);}
+
+  .win7-window{
+    display:flex;flex-direction:column;
+    max-width:96vw;max-height:92vh;
+    background:linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.65));
+    backdrop-filter:blur(20px) saturate(160%);
+    -webkit-backdrop-filter:blur(20px) saturate(160%);
+    border:1px solid var(--glass-border);
+    border-radius:14px;overflow:hidden;
+    box-shadow:0 30px 80px rgba(10,40,80,0.45), inset 0 1px 0 rgba(255,255,255,0.9);
+    transition:width .25s ease, height .25s ease, border-radius .25s ease;
+  }
+  :root[data-theme="dark"] .win7-window{
+    background:linear-gradient(180deg, rgba(18,32,52,0.92), rgba(12,22,38,0.88));
+  }
+
+  .win7-titlebar{
+    height:44px;flex:0 0 auto;position:relative;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 8px 0 14px;
     background:linear-gradient(180deg,#f2fbff 0%, #cfe9f9 44%, #9dceec 46%, #d9f0fb 100%);
     border-bottom:1px solid rgba(255,255,255,0.7);
   }
-  .titlebar::after{
+  .win7-titlebar::after{
     content:"";position:absolute;left:0;right:0;top:0;height:50%;
     background:linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0));
     pointer-events:none;
   }
-  .title-left{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--blue-dark);position:relative;z-index:1;}
-  .title-left .icon{font-size:1.1rem;}
+  :root[data-theme="dark"] .win7-titlebar{
+    background:linear-gradient(180deg,#1c3350 0%, #142943 44%, #0e1e33 46%, #16293f 100%);
+  }
+  .win7-title{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.9rem;color:var(--blue-dark);position:relative;z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .win7-controls{display:flex;gap:6px;position:relative;z-index:1;flex:0 0 auto;}
 
-  .window-controls{display:flex;gap:8px;position:relative;z-index:1;}
   .win-btn{
     width:24px;height:24px;border-radius:50%;
     border:1px solid rgba(20,60,100,0.25);
@@ -137,174 +365,160 @@
   .win-btn.min{background:linear-gradient(180deg,#fff3b0,#f0c94a);}
   .win-btn.max{background:linear-gradient(180deg,#c9f6cf,#63cf75);}
   .win-btn.close{background:linear-gradient(180deg,#ffc2c2,#e05454);}
+  :root[data-theme="dark"] .win-btn{box-shadow:inset 0 2px 3px rgba(255,255,255,0.25), inset 0 -3px 4px rgba(0,0,0,0.3);}
 
-  /* --- tabs --- */
-  .tabs{
-    display:flex;flex-wrap:wrap;gap:8px;
-    padding:16px 20px 4px;
-  }
-  .tab{
-    display:flex;align-items:center;gap:6px;
-    padding:8px 16px;border-radius:20px;
-    background:rgba(255,255,255,0.4);
-    border:1px solid rgba(255,255,255,0.7);
-    color:var(--text-muted);font-size:.85rem;font-weight:600;
-    cursor:pointer;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.7);
-    transition:all .18s ease;
-  }
-  .tab:hover{background:rgba(255,255,255,0.65);}
-  .tab.active{
-    color:#fff;
-    background:linear-gradient(180deg,#67b6ee,#2f8fdb 55%,#1c6fc0);
-    border-color:rgba(20,80,140,0.4);
-    box-shadow:0 3px 8px rgba(20,80,140,0.35), inset 0 1px 0 rgba(255,255,255,0.6);
-  }
-
-  /* --- dropzone --- */
-  .dropzone{
-    margin:14px 20px 6px;
-    border:2px dashed rgba(60,140,200,0.45);
-    border-radius:16px;
-    padding:34px 20px;
-    text-align:center;
-    background:rgba(255,255,255,0.32);
-    transition:all .2s ease;
-  }
-  .dropzone.dragover{
-    border-color:var(--blue-4);
-    background:rgba(200,235,255,0.55);
-    transform:scale(1.01);
-  }
-  .dropzone-icon{font-size:2.2rem;margin-bottom:6px;}
-  .dropzone p{margin:4px 0;color:var(--text-muted);font-size:.92rem;}
-  .dropzone .hint{font-size:.76rem;color:var(--text-muted);opacity:.85;}
-
-  .btn-upload{
-    position:relative;overflow:hidden;
-    margin-top:10px;
-    padding:12px 30px;
-    border:1px solid rgba(20,80,140,0.4);
-    border-radius:24px;
-    background:linear-gradient(180deg,#8fd6ff 0%, #2f8fdb 50%, #1c6fc0 51%, #3aa0e6 100%);
-    color:#fff;font-weight:700;font-size:.92rem;
-    cursor:pointer;
-    box-shadow:0 6px 14px rgba(20,80,140,0.4), inset 0 1px 0 rgba(255,255,255,0.6);
-    transition:filter .15s ease, transform .1s ease;
-  }
-  .btn-upload::before{
-    content:"";position:absolute;left:4%;right:4%;top:8%;height:38%;
-    background:linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0));
-    border-radius:50% / 100%;
-    pointer-events:none;
-  }
-  .btn-upload:hover{filter:brightness(1.08);}
-  .btn-upload:active{transform:scale(.97);}
-
-  /* --- gallery --- */
-  .gallery-wrap{padding:6px 20px 8px;min-height:120px;}
-  .gallery{
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));
-    gap:16px;
-  }
-
-  .card{
-    position:relative;
-    background:rgba(255,255,255,0.55);
-    border:1px solid rgba(255,255,255,0.8);
-    border-radius:14px;
-    overflow:hidden;
-    box-shadow:0 6px 16px rgba(10,60,100,0.12), inset 0 1px 0 rgba(255,255,255,0.85);
-    transition:transform .18s ease, box-shadow .18s ease, opacity .2s ease;
-  }
-  .card:hover{transform:translateY(-4px);box-shadow:0 12px 26px rgba(10,60,100,0.2), inset 0 1px 0 rgba(255,255,255,0.85);}
-
-  .badge{
-    position:absolute;top:8px;left:8px;z-index:2;
-    width:26px;height:26px;border-radius:50%;
-    background:rgba(255,255,255,0.85);
+  .win7-body{
+    flex:1 1 auto;min-height:0;position:relative;
     display:flex;align-items:center;justify-content:center;
-    font-size:.85rem;
-    box-shadow:0 2px 5px rgba(0,0,0,0.15);
+    overflow:auto;background:rgba(10,30,55,0.04);
   }
+  :root[data-theme="dark"] .win7-body{background:rgba(0,0,0,0.22);}
 
-  .thumb{
-    height:140px;width:100%;
-    background:linear-gradient(135deg,#eef7fc,#dbeffc);
-    display:flex;align-items:center;justify-content:center;
-    overflow:hidden;
-    cursor:default;
+  .win7-statusbar{
+    flex:0 0 auto;height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:0 14px;background:linear-gradient(180deg,#eaf6ff,#cfe9fa);border-top:1px solid rgba(255,255,255,0.7);
+    font-size:.78rem;color:var(--blue-dark);
   }
-  .thumb img{width:100%;height:100%;object-fit:cover;cursor:zoom-in;}
-  .thumb video{width:100%;height:100%;object-fit:cover;background:#000;}
-  .thumb.thumb-audio{height:auto;flex-direction:column;gap:8px;padding:18px 12px;}
-  .thumb.thumb-audio .big-icon{font-size:2.4rem;}
-  .thumb.thumb-audio audio{width:100%;height:32px;}
+  :root[data-theme="dark"] .win7-statusbar{background:linear-gradient(180deg,#16293f,#0e1e33);color:#eaf6ff;border-top-color:rgba(255,255,255,0.1);}
+  .win7-status-actions{display:flex;gap:8px;}
+  .win7-status-actions .act-btn{flex:0 0 auto;padding:6px 10px;}
 
-  .card-info{padding:10px 12px 12px;}
-  .fname{
-    font-weight:600;font-size:.85rem;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-  .fmeta{font-size:.72rem;color:var(--text-muted);margin-top:2px;}
+  /* --- viewer window --- */
+  .viewer-window{width:min(1100px,92vw);height:min(760px,86vh);}
+  .viewer-window.maximized{width:100vw;height:100vh;max-width:100vw;max-height:100vh;border-radius:0;}
+  .viewer-body{padding:14px;gap:10px;}
 
-  .actions{display:flex;gap:8px;margin-top:9px;}
-  .act-btn{
-    flex:1;
-    display:flex;align-items:center;justify-content:center;gap:4px;
-    padding:6px 4px;
-    border-radius:10px;
-    border:1px solid rgba(255,255,255,0.7);
-    font-size:.72rem;font-weight:600;
-    cursor:pointer;
+  .nav-arrow{
+    flex:0 0 auto;width:42px;height:42px;border-radius:50%;
+    border:1px solid rgba(20,80,140,0.3);
     background:rgba(255,255,255,0.55);
-    color:var(--text-dark);
+    color:var(--blue-dark);font-size:1.4rem;line-height:1;font-family:inherit;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 10px rgba(10,50,90,0.2), inset 0 1px 0 rgba(255,255,255,0.8);
     transition:filter .15s ease, transform .1s ease;
+    z-index:2;
   }
-  .act-btn:hover{filter:brightness(0.97);}
-  .act-btn:active{transform:scale(.96);}
-  .act-btn.download{background:linear-gradient(180deg,#bfe6ff,#8fc7ec);}
-  .act-btn.delete{background:linear-gradient(180deg,#ffc9c9,#e58a8a);color:#5a1414;}
+  .nav-arrow:hover{filter:brightness(1.1);}
+  .nav-arrow:active{transform:scale(.92);}
+  :root[data-theme="dark"] .nav-arrow{background:rgba(255,255,255,0.1);color:#eaf6ff;border-color:rgba(255,255,255,0.2);}
 
-  /* --- empty state --- */
-  .empty-state{
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:6px;padding:36px 10px 44px;
-    color:var(--text-muted);
-    text-align:center;
-  }
-  .empty-state .icon{font-size:2.4rem;opacity:.8;}
-  .empty-state.hidden{display:none;}
+  .viewer-stage{flex:1 1 auto;height:100%;min-width:0;perspective:1400px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .viewer-flip-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d;}
 
-  /* --- status bar --- */
-  .statusbar{
-    height:34px;
-    display:flex;align-items:center;justify-content:space-between;
-    padding:0 18px;
-    background:linear-gradient(180deg,#eaf6ff,#cfe9fa);
-    border-top:1px solid rgba(255,255,255,0.7);
-    font-size:.76rem;color:var(--blue-dark);
-  }
-  .statusbar span{display:inline-flex;align-items:center;gap:5px;}
+  /* Flip 3D navigation animation (Windows 7 "Flip 3D" style) */
+  .viewer-flip-inner.flip-out-next{transition:transform .3s ease, opacity .3s ease;transform:rotateY(-100deg) scale(.9);opacity:0;}
+  .viewer-flip-inner.flip-out-prev{transition:transform .3s ease, opacity .3s ease;transform:rotateY(100deg) scale(.9);opacity:0;}
+  .viewer-flip-inner.flip-in-from-prev{transition:none;transform:rotateY(100deg) scale(.9);opacity:0;}
+  .viewer-flip-inner.flip-in-from-next{transition:none;transform:rotateY(-100deg) scale(.9);opacity:0;}
+  .viewer-flip-inner.flip-settle{transition:transform .34s cubic-bezier(.22,.61,.36,1), opacity .34s ease;transform:rotateY(0) scale(1);opacity:1;}
 
-  /* --- lightbox --- */
-  .lightbox{
-    position:fixed;inset:0;z-index:999;
-    background:rgba(8,28,48,0.86);
-    backdrop-filter:blur(6px);
-    display:none;align-items:center;justify-content:center;
-    padding:30px;
+  .viewer-photo{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.3);}
+  .viewer-video{max-width:100%;max-height:100%;background:#000;border-radius:4px;}
+  .viewer-pdf{width:100%;height:100%;border:none;background:#fff;border-radius:4px;}
+  .viewer-text{
+    width:100%;height:100%;margin:0;padding:16px;overflow:auto;text-align:left;
+    background:#0d1b2a;color:#dce8f5;font-family:Consolas,'Courier New',monospace;font-size:.82rem;
+    border-radius:4px;white-space:pre-wrap;word-break:break-word;
   }
-  .lightbox.active{display:flex;}
-  .lightbox img{max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 25px 70px rgba(0,0,0,0.5);}
-  .lightbox-close{
-    position:absolute;top:22px;right:26px;
-    width:38px;height:38px;border-radius:50%;
-    background:linear-gradient(180deg,#ffc2c2,#e05454);
-    color:#fff;font-size:1.2rem;border:1px solid rgba(255,255,255,0.4);
-    cursor:pointer;
-    box-shadow:0 3px 10px rgba(0,0,0,0.35);
+  .viewer-generic{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-muted);text-align:center;padding:20px;}
+  .viewer-generic-icon{font-size:4rem;}
+  .viewer-generic-name{font-weight:600;color:var(--text-dark);word-break:break-word;max-width:320px;}
+  .viewer-generic-note{font-size:.78rem;opacity:.85;}
+
+  .viewer-audio-panel{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .audio-art{
+    width:130px;height:130px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff, #b6e0ff 40%, #2f8fdb 80%, #0c3866 100%);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 10px 26px rgba(10,50,90,.35), inset 0 3px 6px rgba(255,255,255,.6);
+    animation:audioSpin 7s linear infinite;
+  }
+  @keyframes audioSpin{from{transform:rotate(0);}to{transform:rotate(360deg);}}
+  .audio-note{font-size:2.6rem;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3));}
+  .audio-name{font-weight:600;color:var(--text-dark);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* --- Windows Media Player 7-style control bar --- */
+  .wmp-bar{
+    flex:0 0 auto;display:flex;align-items:center;gap:10px;
+    padding:8px 14px;
+    background:linear-gradient(180deg,#151f2b,#0a1219);
+    border-top:1px solid rgba(255,255,255,0.08);
+    color:#dce8f5;
+  }
+  .wmp-btn{
+    width:32px;height:32px;border-radius:50%;flex:0 0 auto;
+    border:1px solid rgba(255,255,255,0.15);
+    background:radial-gradient(circle at 35% 30%, #4fb3e8, #1c6fc0 70%, #0c3866 100%);
+    color:#fff;font-size:.85rem;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 6px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.4);
+  }
+  .wmp-time{font-size:.72rem;min-width:36px;text-align:center;color:#9fc0d8;flex:0 0 auto;}
+  input[type=range].wmp-seek{flex:1 1 auto;min-width:60px;}
+  input[type=range].wmp-volume{width:70px;flex:0 0 auto;}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;height:6px;border-radius:4px;
+    background:linear-gradient(to right, #2f8fdb var(--fill,0%), rgba(255,255,255,.18) var(--fill,0%));
+    outline:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff, #8fd6ff 60%, #1c6fc0 100%);
+    border:1px solid rgba(0,0,0,.2);box-shadow:0 1px 3px rgba(0,0,0,.4);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.2);
+    background:radial-gradient(circle at 35% 30%, #fff, #8fd6ff 60%, #1c6fc0 100%);
+  }
+
+  /* --- share window --- */
+  .share-window{width:min(640px,92vw);}
+  .share-window.maximized{width:100vw;height:100vh;max-width:100vw;max-height:100vh;border-radius:0;}
+  .share-body{flex-direction:column;gap:14px;padding:22px;width:100%;}
+  .share-preview{width:100%;max-height:360px;display:flex;align-items:center;justify-content:center;background:rgba(10,30,55,0.06);border-radius:10px;overflow:hidden;padding:10px;}
+  :root[data-theme="dark"] .share-preview{background:rgba(0,0,0,0.25);}
+  .share-media-img{max-width:100%;max-height:340px;object-fit:contain;border-radius:6px;box-shadow:0 10px 24px rgba(0,0,0,.25);}
+  .share-media-video{max-width:100%;max-height:340px;border-radius:6px;background:#000;}
+  .share-audio{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;}
+  .share-audio-icon{font-size:3.4rem;}
+  .share-audio audio{width:100%;}
+  .share-generic{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-muted);}
+  .share-generic-icon{font-size:4rem;}
+  .share-info{text-align:center;}
+  .share-filename{font-weight:700;font-size:1rem;color:var(--text-dark);word-break:break-word;}
+  .share-meta{font-size:.78rem;color:var(--text-muted);margin-top:2px;}
+  .share-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+
+  /* --- camera window --- */
+  .camera-window{width:min(560px,92vw);}
+  .camera-body{padding:0;background:#000;width:100%;}
+  #cameraVideo{width:100%;height:100%;max-height:420px;object-fit:cover;display:block;}
+  .camera-controls{justify-content:center;gap:16px;}
+  .shot-btn{padding:12px 28px;}
+
+  /* --- error window --- */
+  .error-window{width:min(420px,92vw);}
+  .error-body{flex-direction:column;gap:10px;padding:26px 22px;text-align:center;width:100%;}
+  .error-icon{font-size:2.6rem;}
+  #errorMessage{color:var(--text-dark);font-size:.9rem;line-height:1.45;margin:0;}
+  .error-actions{justify-content:flex-end;}
+
+  /* --- toast / balloon notifications --- */
+  .toast-layer{position:fixed;right:18px;bottom:18px;z-index:1200;display:flex;flex-direction:column;gap:10px;pointer-events:none;}
+  .aero-toast{
+    pointer-events:auto;
+    display:flex;align-items:center;gap:8px;
+    padding:12px 16px;border-radius:10px;max-width:280px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.92), rgba(230,246,255,0.92));
+    border:1px solid rgba(255,255,255,0.9);
+    box-shadow:0 10px 26px rgba(10,50,90,0.3), inset 0 1px 0 rgba(255,255,255,0.9);
+    color:var(--text-dark);font-size:.85rem;font-weight:600;
+    transform:translateY(12px);opacity:0;transition:transform .3s ease, opacity .3s ease;
+  }
+  .aero-toast.show{transform:translateY(0);opacity:1;}
+  :root[data-theme="dark"] .aero-toast{
+    background:linear-gradient(180deg, rgba(20,35,58,0.95), rgba(14,26,44,0.95));
+    border-color:rgba(255,255,255,0.15);color:#eaf6ff;
   }
 
   /* --- scrollbar --- */
@@ -314,12 +528,24 @@
     background:linear-gradient(180deg,#a7d8f5,#5aa8de);
     border-radius:10px;border:2px solid rgba(255,255,255,0.5);
   }
+  :root[data-theme="dark"] ::-webkit-scrollbar-track{background:rgba(255,255,255,0.05);}
+  :root[data-theme="dark"] ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#2f5170,#173049);border-color:rgba(0,0,0,0.3);}
 
   @media (max-width:600px){
-    .app-window{margin:0;border-radius:0;max-width:100%;}
-    .topbar{padding:12px 16px;}
-    .titlebar{padding:0 8px 0 12px;}
-    .gallery{grid-template-columns:repeat(auto-fill, minmax(150px,1fr));}
+    .home{padding:0 12px;margin:4px auto 20px;}
+    .topbar{padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px;}
+    .brand-tag{display:none;}
+    .gallery{grid-template-columns:repeat(auto-fill, minmax(140px,1fr));}
+    .toolbar-row{flex-direction:column;align-items:stretch;}
+    .aero-btn{width:100%;}
+    .win7-window{width:96vw !important;height:90vh !important;max-height:90vh;border-radius:10px;}
+    .win7-window.maximized{width:100vw !important;height:100vh !important;border-radius:0;}
+    .share-window{height:auto !important;max-height:92vh;}
+    .nav-arrow{width:34px;height:34px;font-size:1.1rem;}
+    .wmp-bar{flex-wrap:wrap;gap:6px;padding:6px 8px;}
+    input[type=range].wmp-volume{display:none;}
+    .toast-layer{right:10px;bottom:10px;left:10px;}
+    .aero-toast{max-width:none;}
   }
 </style>
 </head>
@@ -333,65 +559,331 @@
   </div>
 
   <header class="topbar">
-    <div class="logo-orb"></div>
-    <div class="logo-text">AeroFiles</div>
-    <div class="logo-sub"></div>
+    <div class="brand">
+      <svg class="earth-logo" width="38" height="38" viewBox="0 0 64 64" aria-hidden="true">
+        <defs>
+          <radialGradient id="oceanGrad" cx="35%" cy="30%" r="75%">
+            <stop offset="0%" stop-color="#bdf0ff"/>
+            <stop offset="45%" stop-color="#4fb3e8"/>
+            <stop offset="80%" stop-color="#1c6fc0"/>
+            <stop offset="100%" stop-color="#0c3866"/>
+          </radialGradient>
+          <radialGradient id="glossGrad" cx="35%" cy="20%" r="55%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.95)"/>
+            <stop offset="55%" stop-color="rgba(255,255,255,0.12)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+        </defs>
+        <circle cx="32" cy="32" r="30" fill="url(#oceanGrad)"/>
+        <path d="M14 20 Q20 14 28 17 Q34 19 32 25 Q28 30 20 28 Q13 27 14 20Z" fill="#5fae5a" opacity="0.9"/>
+        <path d="M36 14 Q46 12 50 20 Q52 26 45 27 Q38 28 36 22 Q34 18 36 14Z" fill="#4f9e58" opacity="0.9"/>
+        <path d="M18 38 Q26 34 33 40 Q38 45 32 50 Q24 54 18 48 Q14 43 18 38Z" fill="#5aa85a" opacity="0.9"/>
+        <path d="M42 36 Q50 34 54 40 Q56 45 49 46 Q44 46 42 42 Q41 38 42 36Z" fill="#4f9e58" opacity="0.85"/>
+        <ellipse cx="24" cy="16" rx="9" ry="3.4" fill="rgba(255,255,255,0.55)"/>
+        <ellipse cx="44" cy="42" rx="10" ry="3.6" fill="rgba(255,255,255,0.5)"/>
+        <ellipse cx="20" cy="46" rx="7" ry="2.6" fill="rgba(255,255,255,0.45)"/>
+        <circle cx="32" cy="32" r="30" fill="url(#glossGrad)"/>
+        <ellipse cx="23" cy="13" rx="13" ry="5.5" fill="rgba(255,255,255,0.55)"/>
+      </svg>
+      <div class="brand-text">
+        <div class="brand-title">AeroFiles</div>
+        <div class="brand-tag" data-i18n="appTag">Локальное облако файлов</div>
+      </div>
+    </div>
+    <div class="topbar-controls">
+      <div class="lang-switch" role="group" aria-label="Language">
+        <button class="lang-btn" data-lang="ru" type="button">RU</button>
+        <button class="lang-btn" data-lang="en" type="button">EN</button>
+        <button class="lang-btn" data-lang="zh" type="button">中</button>
+      </div>
+      <button class="theme-toggle" id="themeToggle" type="button" title="Тема / Theme / 主题">
+        <span id="themeIcon">🖥️</span>
+      </button>
+    </div>
   </header>
 
-  <main class="app-window" id="appWindow">
-    <div class="titlebar">
-      <div class="title-left"><span class="icon"></span><span>Файлы</span></div>
-      <div class="window-controls">
-        <button class="win-btn min" id="btnMin" title="Свернуть">–</button>
-        <button class="win-btn max" id="btnMax" title="Развернуть">▢</button>
-        <button class="win-btn close" id="btnClose" title="Это просто витрина">×</button>
+  <main class="home">
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-filter="all" type="button">🗂️ <span data-i18n="tabAll">Все файлы</span></button>
+      <button class="tab" data-filter="photo" type="button">🖼️ <span data-i18n="tabPhoto">Фото</span></button>
+      <button class="tab" data-filter="video" type="button">🎬 <span data-i18n="tabVideo">Видео</span></button>
+      <button class="tab" data-filter="audio" type="button">🎵 <span data-i18n="tabAudio">Аудио</span></button>
+      <button class="tab" data-filter="file" type="button">📁 <span data-i18n="tabFile">Файлы</span></button>
+    </nav>
+
+    <section class="dropzone" id="dropzone">
+      <div class="dropzone-icon">☁️</div>
+      <p data-i18n="dropTitle">Перетащите сюда файлы</p>
+      <p class="hint" data-i18n="dropHint">или выберите способ ниже — всё хранится локально в этом браузере</p>
+      <div class="toolbar-row">
+        <button class="aero-btn aero-btn-primary" id="uploadBtn" type="button">⬆ <span data-i18n="btnUpload">Загрузить файлы</span></button>
+        <button class="aero-btn aero-btn-secondary" id="cameraBtn" type="button">📷 <span data-i18n="btnCamera">Сделать фото</span></button>
+        <button class="aero-btn aero-btn-ghost" id="pasteBtn" type="button">📋 <span data-i18n="btnPaste">Вставить</span></button>
+      </div>
+      <p class="hint small" data-i18n="pasteHint">Можно вставить файл из буфера обмена — Ctrl+V</p>
+      <input type="file" id="fileInput" multiple hidden>
+    </section>
+
+    <div class="gallery-wrap">
+      <div class="gallery" id="gallery"></div>
+      <div class="empty-state hidden" id="emptyState">
+        <div class="icon">🗃️</div>
+        <div data-i18n="emptyTitle">Здесь пока пусто…</div>
+        <div class="small" data-i18n="emptyHint">Загрузите первый файл, чтобы увидеть его тут</div>
       </div>
     </div>
 
-    <div id="collapsible">
-      <nav class="tabs">
-        <button class="tab active" data-filter="all">🗂️ Все файлы</button>
-        <button class="tab" data-filter="photo">🖼️ Фото</button>
-        <button class="tab" data-filter="video">🎬 Видео</button>
-        <button class="tab" data-filter="audio">🎵 Аудио</button>
-      </nav>
+    <div class="stats-row">
+      <span><strong id="statCount">0</strong> <span data-i18n="statFiles">файлов</span></span>
+      <span id="statSize">0 Б</span>
+    </div>
+  </main>
 
-      <section class="dropzone" id="dropzone">
-        <div class="dropzone-icon"></div>
-        <p>Перетащите сюда фото, видео или аудио</p>
-        <p class="hint">или нажмите кнопку ниже. Файлы сохраняются локально в этом браузере (IndexedDB).</p>
-        <button class="btn-upload" id="uploadBtn">⬆ Загрузить файлы</button>
-        <input type="file" id="fileInput" multiple hidden accept="image/*,video/*,audio/*">
-      </section>
+  <footer class="page-footer">
+    <div data-i18n="footerLine">AeroFiles — ваши файлы остаются в этом браузере</div>
+    <div class="footer-version">v0.2</div>
+  </footer>
 
-      <div class="gallery-wrap">
-        <div class="gallery" id="gallery"></div>
-        <div class="empty-state hidden" id="emptyState">
-          <div class="icon"></div>
-          <div>Здесь пока пусто...</div>
-          <div style="font-size:.8rem;">Загрузите первый файл, чтобы увидеть его тут</div>
+  <!-- ===== Media viewer (Windows 7 style) ===== -->
+  <div class="overlay" id="viewerOverlay">
+    <div class="win7-window viewer-window" id="viewerWindow">
+      <div class="win7-titlebar">
+        <div class="win7-title"><span id="viewerIcon">🖼️</span><span id="viewerTitleText" data-i18n="viewerPhoto">Просмотр фото</span></div>
+        <div class="win7-controls">
+          <button class="win-btn min" id="viewerMin" type="button" title="Свернуть">–</button>
+          <button class="win-btn max" id="viewerMax" type="button" title="Развернуть">▢</button>
+          <button class="win-btn close" id="viewerClose" type="button" title="Закрыть">×</button>
+        </div>
+      </div>
+      <div class="win7-body viewer-body">
+        <button class="nav-arrow nav-prev" id="viewerPrev" type="button" aria-label="Previous">‹</button>
+        <div class="viewer-stage" id="viewerStage">
+          <div class="viewer-flip-inner" id="viewerFlipInner"></div>
+        </div>
+        <button class="nav-arrow nav-next" id="viewerNext" type="button" aria-label="Next">›</button>
+      </div>
+      <div class="wmp-bar" id="viewerPlayerBar" style="display:none;"></div>
+      <div class="win7-statusbar">
+        <span id="viewerFileName"></span>
+        <span class="win7-status-actions">
+          <button class="act-btn share" id="viewerShareBtn" type="button">🔗 <span data-i18n="actShare">Поделиться</span></button>
+          <button class="act-btn download" id="viewerDownloadBtn" type="button">⬇ <span data-i18n="actDownload">Скачать</span></button>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Share window (Windows 7 style) ===== -->
+  <div class="overlay" id="shareOverlay">
+    <div class="win7-window share-window" id="shareWindow">
+      <div class="win7-titlebar">
+        <div class="win7-title"><span>🔗</span><span data-i18n="shareTitle">Поделиться файлом</span></div>
+        <div class="win7-controls">
+          <button class="win-btn min" id="shareMin" type="button" title="Свернуть">–</button>
+          <button class="win-btn max" id="shareMax" type="button" title="Развернуть">▢</button>
+          <button class="win-btn close" id="shareClose" type="button" title="Закрыть">×</button>
+        </div>
+      </div>
+      <div class="win7-body share-body">
+        <div class="share-preview" id="sharePreview"></div>
+        <div class="share-info">
+          <div class="share-filename" id="shareFilename"></div>
+          <div class="share-meta" id="shareMeta"></div>
+        </div>
+        <div class="share-actions">
+          <button class="aero-btn aero-btn-primary" id="shareDownloadBtn" type="button">⬇ <span data-i18n="shareDownload">Скачать файл</span></button>
+          <button class="aero-btn aero-btn-ghost" id="shareSystemBtn" type="button" style="display:none;">📤 <span data-i18n="shareSystem">Отправить через…</span></button>
         </div>
       </div>
     </div>
-
-    <footer class="statusbar">
-      <span> <span id="statCount">0</span> файлов</span>
-      <span> <span id="statSize">0 Б</span></span>
-    </footer>
-  </main>
-
-  <div class="lightbox" id="lightbox">
-    <button class="lightbox-close" id="lightboxClose">×</button>
-    <img id="lightboxImg" src="" alt="">
   </div>
+
+  <!-- ===== Camera window (Windows 7 style) ===== -->
+  <div class="overlay" id="cameraOverlay">
+    <div class="win7-window camera-window" id="cameraWindow">
+      <div class="win7-titlebar">
+        <div class="win7-title"><span>📷</span><span data-i18n="cameraTitle">Сделать фото</span></div>
+        <div class="win7-controls">
+          <button class="win-btn close" id="cameraClose" type="button" title="Закрыть">×</button>
+        </div>
+      </div>
+      <div class="win7-body camera-body">
+        <video id="cameraVideo" autoplay playsinline muted></video>
+      </div>
+      <div class="win7-statusbar camera-controls">
+        <button class="aero-btn aero-btn-ghost" id="cameraCancelBtn" type="button"><span data-i18n="cameraCancel">Отмена</span></button>
+        <button class="aero-btn aero-btn-primary shot-btn" id="cameraShotBtn" type="button">📸 <span data-i18n="cameraShot">Снять</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Error dialog (Windows 7 style) ===== -->
+  <div class="overlay" id="errorOverlay">
+    <div class="win7-window error-window" id="errorWindow">
+      <div class="win7-titlebar">
+        <div class="win7-title"><span>⚠️</span><span id="errorTitleText" data-i18n="errorTitle">Ошибка</span></div>
+        <div class="win7-controls">
+          <button class="win-btn close" id="errorCloseX" type="button" title="Закрыть">×</button>
+        </div>
+      </div>
+      <div class="win7-body error-body">
+        <span class="error-icon">⛔</span>
+        <p id="errorMessage"></p>
+      </div>
+      <div class="win7-statusbar error-actions">
+        <button class="aero-btn aero-btn-primary" id="errorOkBtn" type="button"><span data-i18n="errorOk">ОК</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-layer" id="toastLayer"></div>
 
 <script>
 (() => {
+  /* ============================= i18n ============================= */
+  const LANG = {
+    ru: {
+      appTag:'Локальное облако файлов',
+      tabAll:'Все файлы', tabPhoto:'Фото', tabVideo:'Видео', tabAudio:'Аудио', tabFile:'Файлы',
+      dropTitle:'Перетащите сюда файлы',
+      dropHint:'или выберите способ ниже — всё хранится локально в этом браузере',
+      btnUpload:'Загрузить файлы', btnCamera:'Сделать фото', btnPaste:'Вставить',
+      pasteHint:'Можно вставить файл из буфера обмена — Ctrl+V',
+      emptyTitle:'Здесь пока пусто…', emptyHint:'Загрузите первый файл, чтобы увидеть его тут',
+      statFiles:'файлов',
+      actShare:'Поделиться', actDownload:'Скачать', actDelete:'Удалить',
+      viewerPhoto:'Просмотр фото', viewerVideo:'Просмотр видео', viewerAudio:'Просмотр аудио', viewerFile:'Просмотр файла',
+      shareTitle:'Поделиться файлом', shareDownload:'Скачать файл', shareSystem:'Отправить через…',
+      cameraTitle:'Сделать фото', cameraShot:'Снять', cameraCancel:'Отмена',
+      cameraDenied:'Не удалось получить доступ к камере. Проверьте разрешения браузера.',
+      cameraUnsupported:'Камера недоступна в этом браузере. Откройте страницу через HTTPS или localhost.',
+      errorTitle:'Ошибка', errorOk:'ОК',
+      errorDb:'Не удалось открыть локальное хранилище браузера. Попробуйте открыть страницу через http://localhost, а не напрямую как файл.',
+      errorNoPaste:'В буфере обмена нет подходящих файлов.',
+      errorNoPasteApi:'Браузер не поддерживает чтение буфера обмена. Используйте Ctrl+V.',
+      toastPaste:'Файл добавлен из буфера обмена', toastPasteMany:'Добавлено файлов: {n}',
+      toastCamera:'Снимок сохранён',
+      loading:'Загрузка…', noPreview:'Предпросмотр недоступен для этого типа файла.',
+      footerLine:'AeroFiles — ваши файлы остаются в этом браузере'
+    },
+    en: {
+      appTag:'Your local file cloud',
+      tabAll:'All files', tabPhoto:'Photos', tabVideo:'Video', tabAudio:'Audio', tabFile:'Files',
+      dropTitle:'Drop files here',
+      dropHint:'or choose an option below — everything stays local in this browser',
+      btnUpload:'Upload files', btnCamera:'Take a photo', btnPaste:'Paste',
+      pasteHint:'You can also paste a file from the clipboard — Ctrl+V',
+      emptyTitle:'Nothing here yet…', emptyHint:'Upload your first file to see it here',
+      statFiles:'files',
+      actShare:'Share', actDownload:'Download', actDelete:'Delete',
+      viewerPhoto:'Photo viewer', viewerVideo:'Video player', viewerAudio:'Audio player', viewerFile:'File viewer',
+      shareTitle:'Share file', shareDownload:'Download file', shareSystem:'Share via…',
+      cameraTitle:'Take a photo', cameraShot:'Capture', cameraCancel:'Cancel',
+      cameraDenied:'Could not access the camera. Check your browser permissions.',
+      cameraUnsupported:'Camera is not available in this browser. Open the page over HTTPS or localhost.',
+      errorTitle:'Error', errorOk:'OK',
+      errorDb:'Could not open local browser storage. Try opening the page via http://localhost instead of as a local file.',
+      errorNoPaste:'No supported files found on the clipboard.',
+      errorNoPasteApi:"This browser doesn't support reading the clipboard. Use Ctrl+V instead.",
+      toastPaste:'File added from clipboard', toastPasteMany:'{n} files added',
+      toastCamera:'Photo saved',
+      loading:'Loading…', noPreview:"Preview isn't available for this file type.",
+      footerLine:'AeroFiles — your files stay in this browser'
+    },
+    zh: {
+      appTag:'本地文件云',
+      tabAll:'全部文件', tabPhoto:'照片', tabVideo:'视频', tabAudio:'音频', tabFile:'文件',
+      dropTitle:'将文件拖到此处',
+      dropHint:'或使用下方按钮 — 所有内容都保存在本浏览器中',
+      btnUpload:'上传文件', btnCamera:'拍照', btnPaste:'粘贴',
+      pasteHint:'也可以直接从剪贴板粘贴文件 — Ctrl+V',
+      emptyTitle:'这里还空空如也…', emptyHint:'上传第一个文件后就会显示在这里',
+      statFiles:'个文件',
+      actShare:'分享', actDownload:'下载', actDelete:'删除',
+      viewerPhoto:'照片查看器', viewerVideo:'视频播放器', viewerAudio:'音频播放器', viewerFile:'文件查看器',
+      shareTitle:'分享文件', shareDownload:'下载文件', shareSystem:'通过系统分享…',
+      cameraTitle:'拍照', cameraShot:'拍摄', cameraCancel:'取消',
+      cameraDenied:'无法访问摄像头，请检查浏览器权限。',
+      cameraUnsupported:'此浏览器不支持摄像头，请通过 HTTPS 或 localhost 打开页面。',
+      errorTitle:'错误', errorOk:'确定',
+      errorDb:'无法打开本地浏览器存储。请尝试通过 http://localhost 打开此页面，而不是直接以文件方式打开。',
+      errorNoPaste:'剪贴板中没有支持的文件。',
+      errorNoPasteApi:'此浏览器不支持读取剪贴板，请改用 Ctrl+V。',
+      toastPaste:'已从剪贴板添加文件', toastPasteMany:'已添加 {n} 个文件',
+      toastCamera:'照片已保存',
+      loading:'加载中…', noPreview:'此类型文件不支持预览。',
+      footerLine:'AeroFiles — 您的文件保留在本浏览器中'
+    }
+  };
+  const LOCALE_TAG = {ru:'ru-RU', en:'en-US', zh:'zh-CN'};
+  const SIZE_UNITS = { ru:['Б','КБ','МБ','ГБ'], en:['B','KB','MB','GB'], zh:['字节','KB','MB','GB'] };
+
+  let currentLang = localStorage.getItem('aerofiles-lang');
+  if(!currentLang){
+    const nav = (navigator.language || 'en').slice(0,2);
+    currentLang = ['ru','en','zh'].includes(nav) ? nav : 'en';
+  }
+
+  function t(key){
+    return (LANG[currentLang] && LANG[currentLang][key]) || (LANG.ru[key]) || key;
+  }
+
+  function applyStaticI18n(){
+    document.documentElement.lang = currentLang;
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
+  }
+
+  function onLanguageChange(newLang){
+    currentLang = newLang;
+    localStorage.setItem('aerofiles-lang', currentLang);
+    applyStaticI18n();
+    renderGallery();
+    if(currentViewerRecord) updateViewerTitle(currentViewerRecord);
+  }
+
+  /* ============================= theme ============================= */
+  function currentSystemPrefersDark(){
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function effectiveTheme(pref){
+    if(pref === 'dark' || pref === 'light') return pref;
+    return currentSystemPrefersDark() ? 'dark' : 'light';
+  }
+  function updateThemeIcon(pref){
+    const icon = document.getElementById('themeIcon');
+    icon.textContent = pref === 'dark' ? '🌙' : pref === 'light' ? '☀️' : '🖥️';
+  }
+  function applyTheme(pref){
+    document.documentElement.setAttribute('data-theme', effectiveTheme(pref));
+    localStorage.setItem('aerofiles-theme', pref);
+    updateThemeIcon(pref);
+  }
+  if(window.matchMedia){
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      const pref = localStorage.getItem('aerofiles-theme') || 'system';
+      if(pref === 'system') applyTheme('system');
+    });
+  }
+
+  /* ============================= state ============================= */
   const DB_NAME = 'AeroFilesDB';
   const DB_VERSION = 1;
   const STORE = 'files';
   let db = null;
   let currentFilter = 'all';
+  let allRecords = [];
+  const cardUrls = new Map();
+
+  let viewerItems = [];
+  let currentIndex = 0;
+  let currentMediaEl = null;
+  let currentViewerRecord = null;
+  let viewerObjectUrls = [];
+
+  let shareUrl = null;
+  let shareRecord = null;
+  let cameraStream = null;
 
   const $ = (sel) => document.querySelector(sel);
   const gallery = $('#gallery');
@@ -399,32 +891,103 @@
   const fileInput = $('#fileInput');
   const dropzone = $('#dropzone');
   const uploadBtn = $('#uploadBtn');
+  const cameraBtn = $('#cameraBtn');
+  const pasteBtn = $('#pasteBtn');
   const tabs = document.querySelectorAll('.tab');
   const statCount = $('#statCount');
   const statSize = $('#statSize');
-  const appWindow = $('#appWindow');
-  const collapsible = $('#collapsible');
-  const btnMin = $('#btnMin');
-  const btnMax = $('#btnMax');
-  const btnClose = $('#btnClose');
-  const lightbox = $('#lightbox');
-  const lightboxImg = $('#lightboxImg');
-  const lightboxClose = $('#lightboxClose');
 
-  const icons = { photo: '🖼️', video: '🎬', audio: '🎵', other: '📄' };
+  const viewerOverlay = $('#viewerOverlay');
+  const viewerWindow = $('#viewerWindow');
+  const viewerFlipInner = $('#viewerFlipInner');
+  const viewerPlayerBar = $('#viewerPlayerBar');
+  const viewerPrev = $('#viewerPrev');
+  const viewerNext = $('#viewerNext');
 
+  const shareOverlay = $('#shareOverlay');
+  const shareWindow = $('#shareWindow');
+  const cameraOverlay = $('#cameraOverlay');
+  const errorOverlay = $('#errorOverlay');
+  const toastLayer = $('#toastLayer');
+
+  /* ============================= helpers ============================= */
   function escapeHtml(str){
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
   }
 
+  function extOf(name){
+    const parts = (name || '').split('.');
+    return parts.length > 1 ? parts.pop().toLowerCase() : '';
+  }
+
+  const TEXT_EXTS = ['txt','md','csv','json','log','xml','js','css','html','htm','ts','py','java','c','cpp','h','yml','yaml','ini','conf','sh','bat'];
+  function isTextExt(ext){ return TEXT_EXTS.includes(ext); }
+
+  const EXT_ICONS = {
+    pdf:'📕', doc:'📝', docx:'📝', odt:'📝', rtf:'📃', txt:'📃', md:'📃',
+    xls:'📊', xlsx:'📊', csv:'📊',
+    ppt:'📽️', pptx:'📽️',
+    zip:'🗜️', rar:'🗜️', '7z':'🗜️', tar:'🗜️', gz:'🗜️',
+    json:'🧩', xml:'🧩', html:'🧩', htm:'🧩', js:'🧩', css:'🧩'
+  };
+  function extIcon(name){ return EXT_ICONS[extOf(name)] || '📁'; }
+
+  function categoryOf(mime){
+    mime = mime || '';
+    if(mime.startsWith('image/')) return 'photo';
+    if(mime.startsWith('video/')) return 'video';
+    if(mime.startsWith('audio/')) return 'audio';
+    return 'file';
+  }
+
+  function iconOf(record){
+    if(record.category === 'photo') return '🖼️';
+    if(record.category === 'video') return '🎬';
+    if(record.category === 'audio') return '🎵';
+    return extIcon(record.name);
+  }
+
+  function formatSize(bytes){
+    const u = SIZE_UNITS[currentLang] || SIZE_UNITS.en;
+    if(bytes < 1024) return bytes + ' ' + u[0];
+    if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' ' + u[1];
+    if(bytes < 1024*1024*1024) return (bytes/1024/1024).toFixed(1) + ' ' + u[2];
+    return (bytes/1024/1024/1024).toFixed(2) + ' ' + u[3];
+  }
+
+  function formatDate(ts){
+    const d = new Date(ts);
+    const tag = LOCALE_TAG[currentLang] || 'en-US';
+    return d.toLocaleDateString(tag) + ' ' + d.toLocaleTimeString(tag, {hour:'2-digit', minute:'2-digit'});
+  }
+
+  function showToast(message){
+    const toast = document.createElement('div');
+    toast.className = 'aero-toast';
+    toast.innerHTML = `<span>🌤️</span><span>${escapeHtml(message)}</span>`;
+    toastLayer.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 3200);
+  }
+
+  function showError(message, title){
+    document.getElementById('errorMessage').textContent = message;
+    document.getElementById('errorTitleText').textContent = title || t('errorTitle');
+    errorOverlay.classList.add('active');
+  }
+
+  /* ============================= IndexedDB ============================= */
   function openDB(){
     return new Promise((resolve, reject) => {
       const req = indexedDB.open(DB_NAME, DB_VERSION);
       req.onupgradeneeded = (e) => {
         const database = e.target.result;
-        if (!database.objectStoreNames.contains(STORE)) {
+        if(!database.objectStoreNames.contains(STORE)){
           database.createObjectStore(STORE, { keyPath: 'id' });
         }
       };
@@ -432,11 +995,7 @@
       req.onerror = (e) => reject(e.target.error);
     });
   }
-
-  function store(mode){
-    return db.transaction(STORE, mode).objectStore(STORE);
-  }
-
+  function store(mode){ return db.transaction(STORE, mode).objectStore(STORE); }
   function addRecord(record){
     return new Promise((resolve, reject) => {
       const r = store('readwrite').add(record);
@@ -444,7 +1003,6 @@
       r.onerror = (e) => reject(e.target.error);
     });
   }
-
   function getAllRecords(){
     return new Promise((resolve, reject) => {
       const r = store('readonly').getAll();
@@ -452,7 +1010,6 @@
       r.onerror = (e) => reject(e.target.error);
     });
   }
-
   function deleteRecord(id){
     return new Promise((resolve, reject) => {
       const r = store('readwrite').delete(id);
@@ -461,99 +1018,72 @@
     });
   }
 
-  function categoryOf(mime){
-    if (mime.startsWith('image/')) return 'photo';
-    if (mime.startsWith('video/')) return 'video';
-    if (mime.startsWith('audio/')) return 'audio';
-    return 'other';
+  /* ============================= gallery ============================= */
+  function visibleRecords(){
+    if(currentFilter === 'all') return allRecords;
+    return allRecords.filter(r => r.category === currentFilter || (currentFilter === 'file' && r.category === 'other'));
   }
 
-  function formatSize(bytes){
-    if (bytes < 1024) return bytes + ' Б';
-    if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' КБ';
-    if (bytes < 1024*1024*1024) return (bytes/1024/1024).toFixed(1) + ' МБ';
-    return (bytes/1024/1024/1024).toFixed(2) + ' ГБ';
-  }
-
-  function formatDate(ts){
-    const d = new Date(ts);
-    return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'});
+  function revokeCardUrls(){
+    cardUrls.forEach(u => URL.revokeObjectURL(u));
+    cardUrls.clear();
   }
 
   function buildCard(record){
     const url = URL.createObjectURL(record.blob);
+    cardUrls.set(record.id, url);
+
     const card = document.createElement('div');
     card.className = 'card';
     card.dataset.id = record.id;
     card.dataset.category = record.category;
 
-    let mediaHtml = '';
-    if (record.category === 'photo') {
+    let mediaHtml;
+    if(record.category === 'photo'){
       mediaHtml = `<div class="thumb"><img src="${url}" alt="${escapeHtml(record.name)}" loading="lazy"></div>`;
-    } else if (record.category === 'video') {
-      mediaHtml = `<div class="thumb"><video src="${url}" controls preload="metadata"></video></div>`;
-    } else if (record.category === 'audio') {
-      mediaHtml = `<div class="thumb thumb-audio"><span class="big-icon">🎵</span><audio controls src="${url}"></audio></div>`;
+    } else if(record.category === 'video'){
+      mediaHtml = `<div class="thumb"><video src="${url}#t=0.1" preload="metadata" muted playsinline></video><span class="thumb-play">▶</span></div>`;
+    } else if(record.category === 'audio'){
+      mediaHtml = `<div class="thumb thumb-audio"><span class="big-icon">🎵</span></div>`;
     } else {
-      mediaHtml = `<div class="thumb"><span class="big-icon">📄</span></div>`;
+      mediaHtml = `<div class="thumb thumb-file"><span class="big-icon">${extIcon(record.name)}</span></div>`;
     }
 
     card.innerHTML = `
-      <span class="badge">${icons[record.category] || icons.other}</span>
+      <span class="badge">${iconOf(record)}</span>
       ${mediaHtml}
       <div class="card-info">
         <div class="fname" title="${escapeHtml(record.name)}">${escapeHtml(record.name)}</div>
         <div class="fmeta">${formatSize(record.size)} · ${formatDate(record.date)}</div>
         <div class="actions">
-          <button class="act-btn download">⬇ Скачать</button>
-          <button class="act-btn delete">🗑 Удалить</button>
+          <button class="act-btn share" type="button">🔗 <span>${t('actShare')}</span></button>
+          <button class="act-btn download" type="button">⬇ <span>${t('actDownload')}</span></button>
+          <button class="act-btn delete" type="button">🗑 <span>${t('actDelete')}</span></button>
         </div>
       </div>
     `;
 
-    if (record.category === 'photo') {
-      card.querySelector('img').addEventListener('click', () => {
-        lightboxImg.src = url;
-        lightbox.classList.add('active');
-      });
-    }
-
-    card.querySelector('.download').addEventListener('click', () => {
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = record.name;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    });
-
-    card.querySelector('.delete').addEventListener('click', () => {
-      card.style.transform = 'scale(0.85)';
-      card.style.opacity = '0';
-      setTimeout(async () => {
-        await deleteRecord(record.id);
-        URL.revokeObjectURL(url);
-        card.remove();
-        await updateStats();
-        checkEmpty();
-      }, 180);
-    });
+    card.querySelector('.thumb').addEventListener('click', () => openViewer(record.id));
+    card.querySelector('.share').addEventListener('click', (e) => { e.stopPropagation(); openShare(record.id); });
+    card.querySelector('.download').addEventListener('click', (e) => { e.stopPropagation(); downloadRecord(record); });
+    card.querySelector('.delete').addEventListener('click', (e) => { e.stopPropagation(); removeRecord(record.id); });
 
     return card;
   }
 
-  async function renderAll(){
+  function renderGallery(){
+    revokeCardUrls();
     gallery.innerHTML = '';
-    const records = await getAllRecords();
-    records.forEach(r => gallery.appendChild(buildCard(r)));
+    allRecords.forEach(r => gallery.appendChild(buildCard(r)));
     applyFilter();
-    updateStatsFromRecords(records);
+    updateStatsFromRecords(allRecords);
   }
 
   function applyFilter(){
     const cards = gallery.querySelectorAll('.card');
     cards.forEach(c => {
-      const show = currentFilter === 'all' || c.dataset.category === currentFilter;
+      const cat = c.dataset.category;
+      const show = currentFilter === 'all' || cat === currentFilter || (currentFilter === 'file' && cat === 'other');
       c.style.display = show ? '' : 'none';
     });
     checkEmpty();
@@ -564,41 +1094,50 @@
     emptyState.classList.toggle('hidden', anyVisible);
   }
 
-  async function updateStats(){
-    const records = await getAllRecords();
-    updateStatsFromRecords(records);
-  }
-
   function updateStatsFromRecords(records){
     statCount.textContent = records.length;
     const total = records.reduce((s,r) => s + r.size, 0);
     statSize.textContent = formatSize(total);
   }
 
+  function downloadRecord(record){
+    const url = URL.createObjectURL(record.blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = record.name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  function removeRecord(id){
+    const card = gallery.querySelector(`.card[data-id="${id}"]`);
+    if(card){ card.style.transform = 'scale(0.85)'; card.style.opacity = '0'; }
+    setTimeout(async () => {
+      await deleteRecord(id);
+      allRecords = allRecords.filter(r => r.id !== id);
+      renderGallery();
+    }, 180);
+  }
+
   async function handleFiles(fileList){
     const incoming = [...fileList];
-    const valid = incoming.filter(f => /^(image|video|audio)\//.test(f.type));
-    if (valid.length === 0 && incoming.length > 0) {
-      alert('Поддерживаются только фото, видео и аудио файлы.');
-      return;
-    }
-    for (const file of valid) {
+    if(!incoming.length) return;
+    for(const file of incoming){
       const record = {
         id: (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '_' + Math.random()),
-        name: file.name,
-        type: file.type,
+        name: file.name || 'file',
+        type: file.type || 'application/octet-stream',
         category: categoryOf(file.type),
         size: file.size,
         date: Date.now(),
         blob: file
       };
       await addRecord(record);
-      gallery.prepend(buildCard(record));
-      applyFilter();
-      await updateStats();
+      allRecords.unshift(record);
     }
+    renderGallery();
   }
 
+  /* ============================= upload / dropzone ============================= */
   uploadBtn.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', (e) => {
     handleFiles(e.target.files);
@@ -618,45 +1157,398 @@
     });
   });
   dropzone.addEventListener('drop', (e) => {
-    if (e.dataTransfer && e.dataTransfer.files) handleFiles(e.dataTransfer.files);
+    if(e.dataTransfer && e.dataTransfer.files) handleFiles(e.dataTransfer.files);
   });
   window.addEventListener('dragover', (e) => e.preventDefault());
   window.addEventListener('drop', (e) => e.preventDefault());
 
+  /* ============================= clipboard paste ============================= */
+  document.addEventListener('paste', async (e) => {
+    const dt = e.clipboardData;
+    if(!dt || !dt.items) return;
+    const files = [];
+    for(const item of dt.items){
+      if(item.kind === 'file'){
+        const f = item.getAsFile();
+        if(f) files.push(f);
+      }
+    }
+    if(files.length){
+      e.preventDefault();
+      await handleFiles(files);
+      showToast(files.length > 1 ? t('toastPasteMany').replace('{n}', files.length) : t('toastPaste'));
+    }
+  });
+
+  pasteBtn.addEventListener('click', async () => {
+    try{
+      if(!navigator.clipboard || !navigator.clipboard.read) throw new Error('unsupported');
+      const items = await navigator.clipboard.read();
+      const files = [];
+      for(const item of items){
+        for(const type of item.types){
+          if(/^image\/|^video\/|^audio\//.test(type)){
+            const blob = await item.getType(type);
+            const ext = (type.split('/')[1] || 'bin').split('+')[0];
+            files.push(new File([blob], `clipboard_${Date.now()}.${ext}`, {type}));
+          }
+        }
+      }
+      if(files.length){
+        await handleFiles(files);
+        showToast(files.length > 1 ? t('toastPasteMany').replace('{n}', files.length) : t('toastPaste'));
+      } else {
+        showError(t('errorNoPaste'));
+      }
+    }catch(err){
+      showError(t('errorNoPasteApi'));
+    }
+  });
+
+  /* ============================= tabs ============================= */
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
+      tabs.forEach(tb => tb.classList.remove('active'));
       tab.classList.add('active');
       currentFilter = tab.dataset.filter;
       applyFilter();
     });
   });
 
-  let minimized = false;
-  btnMin.addEventListener('click', () => {
-    minimized = !minimized;
-    collapsible.style.display = minimized ? 'none' : '';
-  });
-  btnMax.addEventListener('click', () => {
-    appWindow.classList.toggle('maximized');
-  });
-  btnClose.addEventListener('click', () => {
-    appWindow.classList.remove('shake');
-    void appWindow.offsetWidth;
-    appWindow.classList.add('shake');
+  /* ============================= camera ============================= */
+  async function openCamera(){
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      showError(t('cameraUnsupported'));
+      return;
+    }
+    cameraOverlay.classList.add('active');
+    const video = document.getElementById('cameraVideo');
+    try{
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+      video.srcObject = cameraStream;
+      await video.play().catch(() => {});
+    }catch(err){
+      closeCamera();
+      showError(t('cameraDenied'));
+    }
+  }
+  function closeCamera(){
+    cameraOverlay.classList.remove('active');
+    const video = document.getElementById('cameraVideo');
+    video.srcObject = null;
+    if(cameraStream){
+      cameraStream.getTracks().forEach(tr => tr.stop());
+      cameraStream = null;
+    }
+  }
+  cameraBtn.addEventListener('click', openCamera);
+  document.getElementById('cameraClose').addEventListener('click', closeCamera);
+  document.getElementById('cameraCancelBtn').addEventListener('click', closeCamera);
+  document.getElementById('cameraShotBtn').addEventListener('click', () => {
+    const video = document.getElementById('cameraVideo');
+    if(!video.videoWidth){ return; }
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    canvas.toBlob(async (blob) => {
+      if(!blob) return;
+      const file = new File([blob], `photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
+      closeCamera();
+      await handleFiles([file]);
+      showToast(t('toastCamera'));
+    }, 'image/jpeg', 0.92);
   });
 
-  lightboxClose.addEventListener('click', () => lightbox.classList.remove('active'));
-  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.classList.remove('active'); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') lightbox.classList.remove('active'); });
+  /* ============================= media viewer ============================= */
+  function updateViewerTitle(record){
+    currentViewerRecord = record;
+    const map = { photo:'viewerPhoto', video:'viewerVideo', audio:'viewerAudio' };
+    const key = map[record.category] || 'viewerFile';
+    document.getElementById('viewerTitleText').textContent = t(key);
+    document.getElementById('viewerIcon').textContent = iconOf(record);
+    document.getElementById('viewerFileName').textContent = record.name;
+  }
+
+  function cleanupCurrentMedia(){
+    if(currentMediaEl){
+      try{ currentMediaEl.pause(); currentMediaEl.removeAttribute('src'); currentMediaEl.load && currentMediaEl.load(); }catch(err){}
+      currentMediaEl = null;
+    }
+    viewerObjectUrls.forEach(u => URL.revokeObjectURL(u));
+    viewerObjectUrls = [];
+  }
+
+  function fmtTime(sec){
+    if(!isFinite(sec) || sec < 0) return '0:00';
+    const m = Math.floor(sec/60);
+    const s = Math.floor(sec%60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  function mountPlayerControls(mediaEl){
+    viewerPlayerBar.innerHTML = `
+      <button class="wmp-btn wmp-playpause" type="button" aria-label="Play/Pause">▶</button>
+      <span class="wmp-time wmp-current">0:00</span>
+      <input type="range" class="wmp-seek" min="0" max="1000" value="0">
+      <span class="wmp-time wmp-duration">0:00</span>
+      <button class="wmp-btn wmp-mute" type="button" aria-label="Mute">🔊</button>
+      <input type="range" class="wmp-volume" min="0" max="100" value="100">
+      <button class="wmp-btn wmp-fullscreen" type="button" aria-label="Fullscreen">⛶</button>
+    `;
+    const playBtn = viewerPlayerBar.querySelector('.wmp-playpause');
+    const seek = viewerPlayerBar.querySelector('.wmp-seek');
+    const curEl = viewerPlayerBar.querySelector('.wmp-current');
+    const durEl = viewerPlayerBar.querySelector('.wmp-duration');
+    const muteBtn = viewerPlayerBar.querySelector('.wmp-mute');
+    const volume = viewerPlayerBar.querySelector('.wmp-volume');
+    const fsBtn = viewerPlayerBar.querySelector('.wmp-fullscreen');
+
+    playBtn.addEventListener('click', () => { mediaEl.paused ? mediaEl.play().catch(()=>{}) : mediaEl.pause(); });
+    mediaEl.addEventListener('play', () => { playBtn.textContent = '⏸'; });
+    mediaEl.addEventListener('pause', () => { playBtn.textContent = '▶'; });
+    mediaEl.addEventListener('loadedmetadata', () => { durEl.textContent = fmtTime(mediaEl.duration); });
+    mediaEl.addEventListener('timeupdate', () => {
+      if(mediaEl.duration){
+        const pct = (mediaEl.currentTime / mediaEl.duration) * 1000;
+        seek.value = pct;
+        seek.style.setProperty('--fill', (pct/10) + '%');
+      }
+      curEl.textContent = fmtTime(mediaEl.currentTime);
+    });
+    seek.addEventListener('input', () => {
+      if(mediaEl.duration) mediaEl.currentTime = (seek.value/1000) * mediaEl.duration;
+    });
+    muteBtn.addEventListener('click', () => {
+      mediaEl.muted = !mediaEl.muted;
+      muteBtn.textContent = mediaEl.muted ? '🔇' : '🔊';
+    });
+    volume.style.setProperty('--fill', '100%');
+    volume.addEventListener('input', () => {
+      mediaEl.volume = volume.value/100;
+      volume.style.setProperty('--fill', volume.value + '%');
+      mediaEl.muted = (mediaEl.volume === 0);
+      muteBtn.textContent = mediaEl.muted ? '🔇' : '🔊';
+    });
+    fsBtn.addEventListener('click', () => {
+      const stage = document.getElementById('viewerStage');
+      if(!document.fullscreenElement) stage.requestFullscreen && stage.requestFullscreen().catch(()=>{});
+      else document.exitFullscreen && document.exitFullscreen();
+    });
+
+    mediaEl.play().catch(() => {});
+  }
+
+  function renderViewerMedia(record){
+    viewerFlipInner.innerHTML = '';
+    viewerPlayerBar.innerHTML = '';
+    viewerPlayerBar.style.display = 'none';
+    currentMediaEl = null;
+
+    if(record.category === 'photo'){
+      const url = URL.createObjectURL(record.blob);
+      viewerObjectUrls.push(url);
+      const img = document.createElement('img');
+      img.src = url; img.alt = record.name; img.className = 'viewer-photo';
+      viewerFlipInner.appendChild(img);
+    } else if(record.category === 'video'){
+      const url = URL.createObjectURL(record.blob);
+      viewerObjectUrls.push(url);
+      const video = document.createElement('video');
+      video.src = url; video.className = 'viewer-video'; video.playsInline = true;
+      viewerFlipInner.appendChild(video);
+      currentMediaEl = video;
+      viewerPlayerBar.style.display = 'flex';
+      mountPlayerControls(video);
+    } else if(record.category === 'audio'){
+      const url = URL.createObjectURL(record.blob);
+      viewerObjectUrls.push(url);
+      const panel = document.createElement('div');
+      panel.className = 'viewer-audio-panel';
+      panel.innerHTML = `<div class="audio-art"><span class="audio-note">🎵</span></div><div class="audio-name">${escapeHtml(record.name)}</div>`;
+      const audio = document.createElement('audio');
+      audio.src = url; audio.style.display = 'none';
+      panel.appendChild(audio);
+      viewerFlipInner.appendChild(panel);
+      currentMediaEl = audio;
+      viewerPlayerBar.style.display = 'flex';
+      mountPlayerControls(audio);
+    } else {
+      const ext = extOf(record.name);
+      if(record.type === 'application/pdf' || ext === 'pdf'){
+        const url = URL.createObjectURL(record.blob);
+        viewerObjectUrls.push(url);
+        const frame = document.createElement('iframe');
+        frame.src = url; frame.className = 'viewer-pdf';
+        viewerFlipInner.appendChild(frame);
+      } else if(isTextExt(ext) || (record.type || '').startsWith('text/')){
+        const pre = document.createElement('pre');
+        pre.className = 'viewer-text';
+        pre.textContent = t('loading');
+        viewerFlipInner.appendChild(pre);
+        record.blob.text().then(txt => { pre.textContent = txt.slice(0, 200000); }).catch(() => { pre.textContent = t('noPreview'); });
+      } else {
+        const box = document.createElement('div');
+        box.className = 'viewer-generic';
+        box.innerHTML = `<span class="viewer-generic-icon">${extIcon(record.name)}</span><div class="viewer-generic-name">${escapeHtml(record.name)}</div><div class="viewer-generic-size">${formatSize(record.size)}</div><div class="viewer-generic-note">${t('noPreview')}</div>`;
+        viewerFlipInner.appendChild(box);
+      }
+    }
+    updateViewerTitle(record);
+  }
+
+  function openViewer(id){
+    viewerItems = visibleRecords();
+    const idx = viewerItems.findIndex(r => r.id === id);
+    if(idx === -1) return;
+    currentIndex = idx;
+    viewerOverlay.classList.add('active');
+    cleanupCurrentMedia();
+    renderViewerMedia(viewerItems[currentIndex]);
+  }
+
+  function closeViewer(){
+    viewerOverlay.classList.remove('active');
+    viewerWindow.classList.remove('maximized');
+    cleanupCurrentMedia();
+    viewerFlipInner.innerHTML = '';
+    currentViewerRecord = null;
+  }
+
+  function showItem(newIndex, direction){
+    if(!viewerItems.length) return;
+    currentIndex = ((newIndex % viewerItems.length) + viewerItems.length) % viewerItems.length;
+    const record = viewerItems[currentIndex];
+    viewerFlipInner.classList.add(direction === 'next' ? 'flip-out-next' : 'flip-out-prev');
+    setTimeout(() => {
+      cleanupCurrentMedia();
+      renderViewerMedia(record);
+      viewerFlipInner.classList.remove('flip-out-next','flip-out-prev');
+      viewerFlipInner.classList.add(direction === 'next' ? 'flip-in-from-prev' : 'flip-in-from-next');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          viewerFlipInner.classList.add('flip-settle');
+          viewerFlipInner.classList.remove('flip-in-from-prev','flip-in-from-next');
+        });
+      });
+      setTimeout(() => viewerFlipInner.classList.remove('flip-settle'), 380);
+    }, 300);
+  }
+
+  viewerPrev.addEventListener('click', () => showItem(currentIndex - 1, 'prev'));
+  viewerNext.addEventListener('click', () => showItem(currentIndex + 1, 'next'));
+  document.getElementById('viewerMin').addEventListener('click', closeViewer);
+  document.getElementById('viewerClose').addEventListener('click', closeViewer);
+  document.getElementById('viewerMax').addEventListener('click', () => viewerWindow.classList.toggle('maximized'));
+  document.getElementById('viewerShareBtn').addEventListener('click', () => { if(currentViewerRecord) openShare(currentViewerRecord.id); });
+  document.getElementById('viewerDownloadBtn').addEventListener('click', () => { if(currentViewerRecord) downloadRecord(currentViewerRecord); });
+  viewerOverlay.addEventListener('click', (e) => { if(e.target === viewerOverlay) closeViewer(); });
+
+  /* ============================= share window ============================= */
+  function openShare(id){
+    const record = allRecords.find(r => r.id === id);
+    if(!record) return;
+    if(shareUrl){ URL.revokeObjectURL(shareUrl); shareUrl = null; }
+    shareUrl = URL.createObjectURL(record.blob);
+    shareRecord = record;
+
+    const preview = document.getElementById('sharePreview');
+    preview.innerHTML = '';
+    let el;
+    if(record.category === 'photo'){
+      el = document.createElement('img'); el.src = shareUrl; el.alt = record.name; el.className = 'share-media-img';
+    } else if(record.category === 'video'){
+      el = document.createElement('video'); el.src = shareUrl; el.controls = true; el.className = 'share-media-video';
+    } else if(record.category === 'audio'){
+      el = document.createElement('div'); el.className = 'share-audio';
+      el.innerHTML = `<span class="share-audio-icon">🎵</span>`;
+      const a = document.createElement('audio'); a.src = shareUrl; a.controls = true;
+      el.appendChild(a);
+    } else {
+      el = document.createElement('div'); el.className = 'share-generic';
+      el.innerHTML = `<span class="share-generic-icon">${extIcon(record.name)}</span>`;
+    }
+    preview.appendChild(el);
+
+    document.getElementById('shareFilename').textContent = record.name;
+    document.getElementById('shareMeta').textContent = `${formatSize(record.size)} · ${formatDate(record.date)}`;
+
+    const sysBtn = document.getElementById('shareSystemBtn');
+    sysBtn.style.display = (navigator.share) ? 'inline-flex' : 'none';
+
+    shareOverlay.classList.add('active');
+  }
+
+  function closeShare(){
+    shareOverlay.classList.remove('active');
+    shareWindow.classList.remove('maximized');
+    if(shareUrl){ URL.revokeObjectURL(shareUrl); shareUrl = null; }
+    shareRecord = null;
+  }
+
+  document.getElementById('shareMin').addEventListener('click', closeShare);
+  document.getElementById('shareClose').addEventListener('click', closeShare);
+  document.getElementById('shareMax').addEventListener('click', () => shareWindow.classList.toggle('maximized'));
+  document.getElementById('shareDownloadBtn').addEventListener('click', () => { if(shareRecord) downloadRecord(shareRecord); });
+  document.getElementById('shareSystemBtn').addEventListener('click', async () => {
+    if(!shareRecord) return;
+    try{
+      const file = new File([shareRecord.blob], shareRecord.name, { type: shareRecord.type });
+      if(navigator.canShare && navigator.canShare({ files: [file] })){
+        await navigator.share({ files: [file], title: shareRecord.name });
+      } else {
+        await navigator.share({ title: shareRecord.name });
+      }
+    }catch(err){ /* cancelled or unsupported */ }
+  });
+  shareOverlay.addEventListener('click', (e) => { if(e.target === shareOverlay) closeShare(); });
+
+  /* ============================= error dialog ============================= */
+  document.getElementById('errorOkBtn').addEventListener('click', () => errorOverlay.classList.remove('active'));
+  document.getElementById('errorCloseX').addEventListener('click', () => errorOverlay.classList.remove('active'));
+  errorOverlay.addEventListener('click', (e) => { if(e.target === errorOverlay) errorOverlay.classList.remove('active'); });
+  cameraOverlay.addEventListener('click', (e) => { if(e.target === cameraOverlay) closeCamera(); });
+
+  /* ============================= keyboard navigation ============================= */
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){
+      if(viewerOverlay.classList.contains('active')) closeViewer();
+      else if(shareOverlay.classList.contains('active')) closeShare();
+      else if(cameraOverlay.classList.contains('active')) closeCamera();
+      else if(errorOverlay.classList.contains('active')) errorOverlay.classList.remove('active');
+      return;
+    }
+    if(viewerOverlay.classList.contains('active')){
+      if(e.key === 'ArrowRight') showItem(currentIndex + 1, 'next');
+      else if(e.key === 'ArrowLeft') showItem(currentIndex - 1, 'prev');
+    }
+  });
+
+  /* ============================= language switch ============================= */
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => onLanguageChange(btn.dataset.lang));
+  });
+
+  /* ============================= theme toggle ============================= */
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const order = ['system','light','dark'];
+    const pref = localStorage.getItem('aerofiles-theme') || 'system';
+    const next = order[(order.indexOf(pref) + 1) % order.length];
+    applyTheme(next);
+  });
+
+  /* ============================= init ============================= */
+  applyStaticI18n();
+  applyTheme(localStorage.getItem('aerofiles-theme') || 'system');
 
   (async () => {
-    try {
+    try{
       db = await openDB();
-      await renderAll();
-    } catch (err) {
+      allRecords = await getAllRecords();
+      renderGallery();
+    }catch(err){
       console.error(err);
-      gallery.innerHTML = '<p style="padding:20px;color:#a33;">Не удалось открыть локальное хранилище браузера. Попробуйте открыть страницу через http://localhost, а не напрямую как файл.</p>';
+      showError(t('errorDb'), t('errorTitle'));
     }
   })();
 })();
